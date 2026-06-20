@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,10 +19,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-  }, []);
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id ?? null);
+      setAuthChecked(true);
+      if (!data.session) navigate({ to: "/auth" });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setUserId(s?.user?.id ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
 
   const { data: wallet } = useQuery({
     queryKey: ["wallet", userId],
@@ -66,6 +76,7 @@ function Home() {
     { label: "FAQ", icon: HelpCircle, to: "/chat" },
   ];
 
+  if (!authChecked) return null;
   if (!userId) return null;
 
   return (
