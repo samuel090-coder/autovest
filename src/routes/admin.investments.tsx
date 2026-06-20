@@ -31,11 +31,17 @@ type FormState = {
   is_active: boolean;
   sort_order: string;
   image_url: string;
+  max_rounds: string;
+  is_flash_sale: boolean;
+  flash_sale_price: string;
+  flash_sale_discount_pct: string;
+  flash_sale_route: string;
 };
 
 const empty: FormState = {
   name: "", price: "", cycle_days: "10", daily_income: "", total_income: "",
   description: "", category: "product", is_hot: false, is_active: true, sort_order: "0", image_url: "",
+  max_rounds: "2", is_flash_sale: false, flash_sale_price: "", flash_sale_discount_pct: "", flash_sale_route: "/orders",
 };
 
 function AdminInvestments() {
@@ -55,6 +61,11 @@ function AdminInvestments() {
         daily_income: Number(f.daily_income), total_income: Number(f.total_income),
         description: f.description, category: f.category, is_hot: f.is_hot,
         is_active: f.is_active, sort_order: Number(f.sort_order), image_url: f.image_url || null,
+        max_rounds: Number(f.max_rounds) || 2,
+        is_flash_sale: f.is_flash_sale,
+        flash_sale_price: f.is_flash_sale && f.flash_sale_price ? Number(f.flash_sale_price) : null,
+        flash_sale_discount_pct: f.is_flash_sale && f.flash_sale_discount_pct ? Number(f.flash_sale_discount_pct) : null,
+        flash_sale_route: f.is_flash_sale ? f.flash_sale_route : null,
       };
       if (f.id) {
         const { error } = await supabase.from("investments").update(payload).eq("id", f.id);
@@ -68,7 +79,8 @@ function AdminInvestments() {
       toast.success("Saved");
       qc.invalidateQueries({ queryKey: ["admin-investments"] });
       qc.invalidateQueries({ queryKey: ["products"] });
-      qc.invalidateQueries({ queryKey: ["hero-investment"] });
+      qc.invalidateQueries({ queryKey: ["welfare-items"] });
+      qc.invalidateQueries({ queryKey: ["flash-sale"] });
       setForm(empty);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -116,6 +128,11 @@ function AdminInvestments() {
                 daily_income: String(p.daily_income), total_income: String(p.total_income),
                 description: p.description ?? "", category: p.category, is_hot: p.is_hot, is_active: p.is_active,
                 sort_order: String(p.sort_order), image_url: p.image_url ?? "",
+                max_rounds: String(p.max_rounds ?? 2),
+                is_flash_sale: !!p.is_flash_sale,
+                flash_sale_price: p.flash_sale_price != null ? String(p.flash_sale_price) : "",
+                flash_sale_discount_pct: p.flash_sale_discount_pct != null ? String(p.flash_sale_discount_pct) : "",
+                flash_sale_route: p.flash_sale_route ?? "/orders",
               })}><Pencil className="h-3 w-3" /></Button>
               <Button size="sm" variant="destructive" onClick={() => confirm("Delete?") && del.mutate(p.id)}><Trash2 className="h-3 w-3" /></Button>
             </div>
@@ -155,9 +172,38 @@ function AdminInvestments() {
           </Field>
           <div className="grid grid-cols-3 gap-2">
             <Field label="Sort"><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} /></Field>
+            <Field label="Rounds"><Input type="number" value={form.max_rounds} onChange={(e) => setForm({ ...form, max_rounds: e.target.value })} /></Field>
             <Field label="Hot"><div className="pt-2"><Switch checked={form.is_hot} onCheckedChange={(v) => setForm({ ...form, is_hot: v })} /></div></Field>
-            <Field label="Active"><div className="pt-2"><Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} /></div></Field>
           </div>
+          <Field label="Active"><div className="pt-2"><Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} /></div></Field>
+
+          <div className="rounded-md border border-dashed p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold">Flash sale popup</Label>
+              <Switch checked={form.is_flash_sale} onCheckedChange={(v) => setForm({ ...form, is_flash_sale: v })} />
+            </div>
+            {form.is_flash_sale && (
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="Sale price (₦)"><Input type="number" value={form.flash_sale_price} onChange={(e) => setForm({ ...form, flash_sale_price: e.target.value })} /></Field>
+                  <Field label="Discount %"><Input type="number" value={form.flash_sale_discount_pct} onChange={(e) => setForm({ ...form, flash_sale_discount_pct: e.target.value })} /></Field>
+                </div>
+                <Field label="Show popup on page">
+                  <Select value={form.flash_sale_route} onValueChange={(v) => setForm({ ...form, flash_sale_route: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="/">Home</SelectItem>
+                      <SelectItem value="/orders">Orders</SelectItem>
+                      <SelectItem value="/wallet">Wallet</SelectItem>
+                      <SelectItem value="/team">Team</SelectItem>
+                      <SelectItem value="/chat">Chat</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </>
+            )}
+          </div>
+
           <div className="flex gap-2">
             <Button type="submit" disabled={save.isPending} className="flex-1">{save.isPending ? "Saving…" : form.id ? "Update" : "Create"}</Button>
             {form.id && <Button type="button" variant="outline" onClick={() => setForm(empty)}>Cancel</Button>}
