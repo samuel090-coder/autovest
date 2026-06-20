@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
 const InputSchema = z.object({
   imageDataUrl: z.string().startsWith("data:image/"),
@@ -12,7 +10,6 @@ export const extractInvestmentFromImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data, context }) => {
-    // Admin check
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
       _role: "admin",
@@ -22,35 +19,48 @@ export const extractInvestmentFromImage = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI not configured");
 
-    const gateway = createLovableAiGatewayProvider(apiKey);
-
     const prompt = `You are extracting investment product details from a screenshot of an investment app card.
 Return ONLY a strict JSON object with these exact keys (no markdown, no commentary):
 {
-  "name": string,                  // e.g. "Compact car", "Senior partner", "VIP car"
-  "price": number,                 // in Naira, no symbols, no commas
-  "cycle_days": number,            // investment cycle in days
-  "daily_income": number,          // daily income in Naira
-  "total_income": number,          // total income in Naira
+  "name": string,
+  "price": number,
+  "cycle_days": number,
+  "daily_income": number,
+  "total_income": number,
   "category": "welfare" | "product",
-  "description": string            // short marketing description (1-3 sentences)
+  "description": string
 }
-If a field is missing, infer a reasonable value. Numbers must be plain integers/floats.`;
+If a field is missing, infer a reasonable value. Numbers must be plain integers/floats (no symbols, no commas).`;
 
-    const { text } = await generateText({
-      model: gateway("google/gemini-3-flash-preview"),
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image", image: data.imageDataUrl },
-          ],
-        },
-      ],
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: data.imageDataUrl } },
+            ],
+          },
+        ],
+      }),
     });
 
-    // Extract JSON
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`AI gateway error ${res.status}: ${errText}`);
+    }
+
+    const json = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    const text = json.choices?.[0]?.message?.content ?? "";
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("AI did not return JSON");
     const parsed = JSON.parse(match[0]);
