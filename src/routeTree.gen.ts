@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WithdrawRouteImport } from './routes/withdraw'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as OrdersRouteImport } from './routes/orders'
@@ -24,6 +25,11 @@ import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
 
+const WithdrawRoute = WithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof OrdersRoute
   '/team': typeof TeamRoute
   '/wallet': typeof WalletRoute
+  '/withdraw': typeof WithdrawRoute
   '/admin/ai-create': typeof AdminAiCreateRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/investments': typeof AdminInvestmentsRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersRoute
   '/team': typeof TeamRoute
   '/wallet': typeof WalletRoute
+  '/withdraw': typeof WithdrawRoute
   '/admin/ai-create': typeof AdminAiCreateRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/investments': typeof AdminInvestmentsRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/orders': typeof OrdersRoute
   '/team': typeof TeamRoute
   '/wallet': typeof WalletRoute
+  '/withdraw': typeof WithdrawRoute
   '/admin/ai-create': typeof AdminAiCreateRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/investments': typeof AdminInvestmentsRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/team'
     | '/wallet'
+    | '/withdraw'
     | '/admin/ai-create'
     | '/admin/banners'
     | '/admin/investments'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/team'
     | '/wallet'
+    | '/withdraw'
     | '/admin/ai-create'
     | '/admin/banners'
     | '/admin/investments'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/team'
     | '/wallet'
+    | '/withdraw'
     | '/admin/ai-create'
     | '/admin/banners'
     | '/admin/investments'
@@ -201,11 +213,19 @@ export interface RootRouteChildren {
   OrdersRoute: typeof OrdersRoute
   TeamRoute: typeof TeamRoute
   WalletRoute: typeof WalletRoute
+  WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/withdraw': {
+      id: '/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof WithdrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wallet': {
       id: '/wallet'
       path: '/wallet'
@@ -335,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersRoute: OrdersRoute,
   TeamRoute: TeamRoute,
   WalletRoute: WalletRoute,
+  WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
 }
 export const routeTree = rootRouteImport

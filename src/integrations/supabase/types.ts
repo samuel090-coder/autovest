@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      bank_accounts: {
+        Row: {
+          account_number: string
+          bank_name: string
+          created_at: string
+          holder_name: string
+          id: string
+          is_default: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_number: string
+          bank_name: string
+          created_at?: string
+          holder_name: string
+          id?: string
+          is_default?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_number?: string
+          bank_name?: string
+          created_at?: string
+          holder_name?: string
+          id?: string
+          is_default?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           id: string
@@ -57,10 +90,15 @@ export type Database = {
           cycle_days: number
           daily_income: number
           description: string | null
+          flash_sale_discount_pct: number | null
+          flash_sale_price: number | null
+          flash_sale_route: string | null
           id: string
           image_url: string | null
           is_active: boolean
+          is_flash_sale: boolean
           is_hot: boolean
+          max_rounds: number
           name: string
           price: number
           sort_order: number
@@ -72,10 +110,15 @@ export type Database = {
           cycle_days: number
           daily_income: number
           description?: string | null
+          flash_sale_discount_pct?: number | null
+          flash_sale_price?: number | null
+          flash_sale_route?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_flash_sale?: boolean
           is_hot?: boolean
+          max_rounds?: number
           name: string
           price: number
           sort_order?: number
@@ -87,10 +130,15 @@ export type Database = {
           cycle_days?: number
           daily_income?: number
           description?: string | null
+          flash_sale_discount_pct?: number | null
+          flash_sale_price?: number | null
+          flash_sale_route?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_flash_sale?: boolean
           is_hot?: boolean
+          max_rounds?: number
           name?: string
           price?: number
           sort_order?: number
@@ -130,6 +178,44 @@ export type Database = {
           referred_by?: string | null
         }
         Relationships: []
+      }
+      referral_earnings: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          referee_id: string
+          referrer_id: string
+          source_transaction_id: string | null
+          tier: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          referee_id: string
+          referrer_id: string
+          source_transaction_id?: string | null
+          tier?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          referee_id?: string
+          referrer_id?: string
+          source_transaction_id?: string | null
+          tier?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_earnings_source_transaction_id_fkey"
+            columns: ["source_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
@@ -181,7 +267,9 @@ export type Database = {
       }
       user_investments: {
         Row: {
+          claimed_at: string | null
           collected_income: number
+          completed_at: string | null
           cycle_days: number
           daily_income: number
           id: string
@@ -190,12 +278,15 @@ export type Database = {
           price_paid: number
           purchased_at: string
           quantity: number
+          round: number
           status: string
           total_income: number
           user_id: string
         }
         Insert: {
+          claimed_at?: string | null
           collected_income?: number
+          completed_at?: string | null
           cycle_days: number
           daily_income: number
           id?: string
@@ -204,12 +295,15 @@ export type Database = {
           price_paid: number
           purchased_at?: string
           quantity?: number
+          round?: number
           status?: string
           total_income: number
           user_id: string
         }
         Update: {
+          claimed_at?: string | null
           collected_income?: number
+          completed_at?: string | null
           cycle_days?: number
           daily_income?: number
           id?: string
@@ -218,6 +312,7 @@ export type Database = {
           price_paid?: number
           purchased_at?: string
           quantity?: number
+          round?: number
           status?: string
           total_income?: number
           user_id?: string
@@ -257,6 +352,7 @@ export type Database = {
         Row: {
           balance: number
           cumulative_income: number
+          referral_bonus: number
           team_size: number
           total_withdrawals: number
           updated_at: string
@@ -265,6 +361,7 @@ export type Database = {
         Insert: {
           balance?: number
           cumulative_income?: number
+          referral_bonus?: number
           team_size?: number
           total_withdrawals?: number
           updated_at?: string
@@ -273,6 +370,7 @@ export type Database = {
         Update: {
           balance?: number
           cumulative_income?: number
+          referral_bonus?: number
           team_size?: number
           total_withdrawals?: number
           updated_at?: string
@@ -285,6 +383,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_investment: { Args: { _uinv_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -292,12 +391,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      start_next_round: { Args: { _uinv_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
       investment_category: "welfare" | "product"
       transaction_status: "pending" | "approved" | "rejected"
-      transaction_type: "recharge" | "withdraw" | "invest" | "income"
+      transaction_type:
+        | "recharge"
+        | "withdraw"
+        | "invest"
+        | "income"
+        | "referral"
+        | "claim"
+        | "bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -428,7 +535,15 @@ export const Constants = {
       app_role: ["admin", "user"],
       investment_category: ["welfare", "product"],
       transaction_status: ["pending", "approved", "rejected"],
-      transaction_type: ["recharge", "withdraw", "invest", "income"],
+      transaction_type: [
+        "recharge",
+        "withdraw",
+        "invest",
+        "income",
+        "referral",
+        "claim",
+        "bonus",
+      ],
     },
   },
 } as const

@@ -56,7 +56,7 @@ function WalletPage() {
   }
 
   const menu = [
-    { label: "Bank card", icon: CreditCard, to: "/wallet" },
+    { label: "Bank card / Withdraw", icon: CreditCard, to: "/withdraw" },
     { label: "Lucky draw", icon: Ticket, to: "/wallet" },
     { label: "Free cash", icon: Gift, to: "/wallet" },
     { label: "Balance bill", icon: ClipboardList, to: "/wallet" },
