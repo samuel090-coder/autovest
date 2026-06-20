@@ -76,6 +76,7 @@ function Home() {
     { label: "FAQ", icon: HelpCircle, to: "/chat" },
   ];
 
+  if (!authChecked) return null;
   if (!userId) return null;
 
   return (
