@@ -89,22 +89,22 @@ async function handleLogin(e: React.FormEvent) {
   navigate({ to: "/" });
     }
   async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    if (password.length < 6) return toast.error("Password must be at least 6 characters");
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: regEmail || phoneEmail(phone),
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { full_name: regName, phone, referral_code: regRef },
-      },
-    });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Account created");
-    navigate({ to: "/" });
-  }
+  e.preventDefault();
+  if (password.length < 6) return toast.error("Password must be at least 6 characters");
+  setLoading(true);
+  const { error } = await supabase.auth.signUp({
+    email: phoneEmail(phone),   // ← ALWAYS use phone-based email
+    password,
+    options: {
+      emailRedirectTo: window.location.origin,
+      data: { full_name: regName, phone, email: regEmail, referral_code: regRef },
+    },
+  });
+  setLoading(false);
+  if (error) return toast.error(error.message);
+  toast.success("Account created");
+  navigate({ to: "/" });
+}
 
   return (
     <div className="min-h-screen bg-red-600 px-4 py-4">
