@@ -58,17 +58,36 @@ function AuthPage() {
   function phoneEmail(p: string) {
     return `${p.replace(/[^0-9]/g, "")}@investpro.local`;
   }
+async function handleLogin(e: React.FormEvent) {
+  e.preventDefault();
+  setLoading(true);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: phoneEmail(phone), password });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Welcome back");
-    navigate({ to: "/" });
+  // First try phone-based login
+  let { error } = await supabase.auth.signInWithPassword({ 
+    email: phoneEmail(phone), password 
+  });
+
+  // If that fails, look up their real email by phone number
+  if (error) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("phone", phone.replace(/[^0-9]/g, ""))
+      .maybeSingle();
+
+    if (profile?.email) {
+      const { error: error2 } = await supabase.auth.signInWithPassword({ 
+        email: profile.email, password 
+      });
+      error = error2 ?? null;
+    }
   }
 
+  setLoading(false);
+  if (error) return toast.error("Invalid phone number or password");
+  toast.success("Welcome back");
+  navigate({ to: "/" });
+    }
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 6) return toast.error("Password must be at least 6 characters");
