@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WithdrawRouteImport } from './routes/withdraw'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
+import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -38,6 +39,11 @@ const WalletRoute = WalletRouteImport.update({
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RechargeRoute = RechargeRouteImport.update({
+  id: '/recharge',
+  path: '/recharge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersRoute = OrdersRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/orders': typeof OrdersRoute
+  '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
   '/wallet': typeof WalletRoute
   '/withdraw': typeof WithdrawRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/orders': typeof OrdersRoute
+  '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
   '/wallet': typeof WalletRoute
   '/withdraw': typeof WithdrawRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/orders': typeof OrdersRoute
+  '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
   '/wallet': typeof WalletRoute
   '/withdraw': typeof WithdrawRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/orders'
+    | '/recharge'
     | '/team'
     | '/wallet'
     | '/withdraw'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/orders'
+    | '/recharge'
     | '/team'
     | '/wallet'
     | '/withdraw'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/orders'
+    | '/recharge'
     | '/team'
     | '/wallet'
     | '/withdraw'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ChatRoute: typeof ChatRoute
   OrdersRoute: typeof OrdersRoute
+  RechargeRoute: typeof RechargeRoute
   TeamRoute: typeof TeamRoute
   WalletRoute: typeof WalletRoute
   WithdrawRoute: typeof WithdrawRoute
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recharge': {
+      id: '/recharge'
+      path: '/recharge'
+      fullPath: '/recharge'
+      preLoaderRoute: typeof RechargeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders': {
@@ -353,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ChatRoute: ChatRoute,
   OrdersRoute: OrdersRoute,
+  RechargeRoute: RechargeRoute,
   TeamRoute: TeamRoute,
   WalletRoute: WalletRoute,
   WithdrawRoute: WithdrawRoute,
