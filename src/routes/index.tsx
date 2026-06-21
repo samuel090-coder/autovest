@@ -78,7 +78,7 @@ function Home() {
           </div>
           <div className="mt-4 flex items-end justify-between">
             <div className="text-3xl font-bold tracking-tight">{formatNaira(wallet?.balance ?? 0)}</div>
-            <Link to="/wallet" className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
+            <Link to="/recharge" className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
               Recharge <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
