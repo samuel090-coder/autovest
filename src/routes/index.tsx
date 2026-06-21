@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, BottomNav } from "@/components/app-shell";
 import { SupportBadge } from "@/components/support-badge";
+import { AnnouncementPopups } from "@/components/announcement-popups";
 import { formatNaira } from "@/lib/format";
 import { ArrowRight, Headphones, Gift, HandCoins, ClipboardCheck, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
