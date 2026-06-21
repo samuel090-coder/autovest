@@ -157,6 +157,7 @@ function Home() {
 
       <SupportBadge />
       <BottomNav />
+      <AnnouncementPopups />
     </AppShell>
   );
 }
