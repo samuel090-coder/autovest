@@ -31,9 +31,9 @@ function useSetting(key: string) {
   const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["setting", key],
-    queryFn: async () => {
+    queryFn: async (): Promise<Record<string, any>> => {
       const { data } = await supabase.from("site_settings").select("value").eq("key", key).maybeSingle();
-      return data?.value ?? {};
+      return (data?.value as Record<string, any>) ?? {};
     },
   });
   const save = useMutation({

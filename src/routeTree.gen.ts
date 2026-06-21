@@ -22,6 +22,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
@@ -91,6 +92,11 @@ const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
   path: '/transactions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInvestmentsRoute = AdminInvestmentsRouteImport.update({
   id: '/investments',
   path: '/investments',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/admin/ai-create': typeof AdminAiCreateRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/admin/ai-create': typeof AdminAiCreateRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/admin/ai-create': typeof AdminAiCreateRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/admin/ai-create'
     | '/admin/banners'
     | '/admin/investments'
+    | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/admin/ai-create'
     | '/admin/banners'
     | '/admin/investments'
+    | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/admin/ai-create'
     | '/admin/banners'
     | '/admin/investments'
+    | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
@@ -323,6 +335,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTransactionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/investments': {
       id: '/admin/investments'
       path: '/investments'
@@ -351,6 +370,7 @@ interface AdminRouteChildren {
   AdminAiCreateRoute: typeof AdminAiCreateRoute
   AdminBannersRoute: typeof AdminBannersRoute
   AdminInvestmentsRoute: typeof AdminInvestmentsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -360,6 +380,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAiCreateRoute: AdminAiCreateRoute,
   AdminBannersRoute: AdminBannersRoute,
   AdminInvestmentsRoute: AdminInvestmentsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
