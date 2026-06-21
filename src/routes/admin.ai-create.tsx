@@ -37,6 +37,11 @@ function AiCreate() {
     const reader = new FileReader();
     reader.onload = () => setScreenshot(reader.result as string);
     reader.readAsDataURL(file);
+    // Auto-upload screenshot as the default cover image so it always shows on the site.
+    setUploading(true);
+    try { const url = await uploadAndGetUrl("investment-images", file); setCoverUrl(url); }
+    catch (err: any) { toast.error(`Cover upload failed: ${err.message}`); }
+    finally { setUploading(false); }
   }
 
   async function runExtract() {
@@ -61,10 +66,12 @@ function AiCreate() {
 
   async function postNow() {
     if (!data) return;
+    if (uploading) { toast.error("Cover image still uploading…"); return; }
+    if (!coverUrl) { toast.error("Cover image is required"); return; }
     setPosting(true);
     try {
       const { error } = await supabase.from("investments").insert({
-        ...data, image_url: coverUrl || null, is_active: true, sort_order: 0,
+        ...data, image_url: coverUrl, is_active: true, sort_order: 0,
       });
       if (error) throw error;
       toast.success("Investment posted");
