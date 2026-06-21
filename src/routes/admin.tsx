@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Boxes, Sparkles, Image as ImageIcon, Users, Receipt, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Boxes, Sparkles, Image as ImageIcon, Users, Receipt, ArrowLeft, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -17,11 +17,12 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const items: Array<{ to: "/admin" | "/admin/investments" | "/admin/ai-create" | "/admin/banners" | "/admin/users" | "/admin/transactions"; label: string; icon: typeof LayoutDashboard; exact?: boolean }> = [
+  const items: Array<{ to: "/admin" | "/admin/investments" | "/admin/ai-create" | "/admin/banners" | "/admin/users" | "/admin/transactions" | "/admin/settings"; label: string; icon: typeof LayoutDashboard; exact?: boolean }> = [
     { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
     { to: "/admin/investments", label: "Investments", icon: Boxes },
     { to: "/admin/ai-create", label: "AI Create", icon: Sparkles },
     { to: "/admin/banners", label: "Banners", icon: ImageIcon },
+    { to: "/admin/settings", label: "Popups & Recharge", icon: Settings },
     { to: "/admin/users", label: "Users", icon: Users },
     { to: "/admin/transactions", label: "Transactions", icon: Receipt },
   ];

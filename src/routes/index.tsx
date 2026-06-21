@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, BottomNav } from "@/components/app-shell";
 import { SupportBadge } from "@/components/support-badge";
+import { AnnouncementPopups } from "@/components/announcement-popups";
 import { formatNaira } from "@/lib/format";
 import { ArrowRight, Headphones, Gift, HandCoins, ClipboardCheck, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,7 @@ function Home() {
     queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "welfare").order("sort_order")).data ?? [],
   });
 
-  const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/wallet" | "/orders"; badge?: number }> = [
+  const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/wallet" | "/orders" | "/recharge"; badge?: number }> = [
     { label: "Message", icon: Headphones, to: "/chat", badge: 0 },
     { label: "Free Cash", icon: Gift, to: "/wallet" },
     { label: "Cash Benefits", icon: HandCoins, to: "/wallet" },
@@ -77,7 +78,7 @@ function Home() {
           </div>
           <div className="mt-4 flex items-end justify-between">
             <div className="text-3xl font-bold tracking-tight">{formatNaira(wallet?.balance ?? 0)}</div>
-            <Link to="/wallet" className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
+            <Link to="/recharge" className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
               Recharge <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -156,6 +157,7 @@ function Home() {
 
       <SupportBadge />
       <BottomNav />
+      <AnnouncementPopups />
     </AppShell>
   );
 }
