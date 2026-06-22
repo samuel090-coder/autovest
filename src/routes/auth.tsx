@@ -62,7 +62,8 @@ useEffect(() => {
   });
 }, []);
 
-async function handleInstall() {
+async function handleInstall(e: React.MouseEvent) {
+  e.preventDefault();
   if (!deferredPrompt) {
     toast.info("Tap your browser menu → 'Add to Home Screen'");
     return;
