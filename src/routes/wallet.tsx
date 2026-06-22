@@ -55,14 +55,14 @@ function WalletPage() {
     navigate({ to: "/auth" });
   }
 
-  const menu = [
+  const menu: ReadonlyArray<{ label: string; icon: typeof CreditCard; to: "/withdraw" | "/lucky-draw" | "/free-cash" | "/wallet" | "/orders" | "/certification" }> = [
     { label: "Bank card / Withdraw", icon: CreditCard, to: "/withdraw" },
-    { label: "Lucky draw", icon: Ticket, to: "/wallet" },
-    { label: "Free cash", icon: Gift, to: "/wallet" },
-    { label: "Balance bill", icon: ClipboardList, to: "/wallet" },
-    { label: "Recharge record", icon: Database, to: "/wallet" },
-    { label: "Withdrawal record", icon: Upload, to: "/wallet" },
-  ] as const;
+    { label: "Lucky draw", icon: Ticket, to: "/lucky-draw" },
+    { label: "Free cash", icon: Gift, to: "/free-cash" },
+    { label: "Balance bill", icon: ClipboardList, to: "/orders" },
+    { label: "Recharge record", icon: Database, to: "/orders" },
+    { label: "Withdrawal proofs", icon: Upload, to: "/certification" },
+  ];
 
   return (
     <AppShell>
