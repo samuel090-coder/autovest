@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { uploadAndGetUrl } from "@/lib/storage";
 import { SupportBadge } from "@/components/support-badge";
 
 export const Route = createFileRoute("/certification")({
