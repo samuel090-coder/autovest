@@ -14,7 +14,11 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
+import { Route as FreeCashRouteImport } from './routes/free-cash'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as CertificationRouteImport } from './routes/certification'
+import { Route as BonusTaskRouteImport } from './routes/bonus-task'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,6 +30,8 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
+import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
+import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
 const WithdrawRoute = WithdrawRouteImport.update({
   id: '/withdraw',
@@ -52,9 +58,29 @@ const OrdersRoute = OrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LuckyDrawRoute = LuckyDrawRouteImport.update({
+  id: '/lucky-draw',
+  path: '/lucky-draw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeCashRoute = FreeCashRouteImport.update({
+  id: '/free-cash',
+  path: '/free-cash',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificationRoute = CertificationRouteImport.update({
+  id: '/certification',
+  path: '/certification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BonusTaskRoute = BonusTaskRouteImport.update({
+  id: '/bonus-task',
+  path: '/bonus-task',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -112,12 +138,27 @@ const AdminAiCreateRoute = AdminAiCreateRouteImport.update({
   path: '/ai-create',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
+  id: '/api/public/hooks/paystack',
+  path: '/api/public/hooks/paystack',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksGenerateProofRoute =
+  ApiPublicHooksGenerateProofRouteImport.update({
+    id: '/api/public/hooks/generate-proof',
+    path: '/api/public/hooks/generate-proof',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/bonus-task': typeof BonusTaskRoute
+  '/certification': typeof CertificationRoute
   '/chat': typeof ChatRoute
+  '/free-cash': typeof FreeCashRoute
+  '/lucky-draw': typeof LuckyDrawRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -131,11 +172,17 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
+  '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/bonus-task': typeof BonusTaskRoute
+  '/certification': typeof CertificationRoute
   '/chat': typeof ChatRoute
+  '/free-cash': typeof FreeCashRoute
+  '/lucky-draw': typeof LuckyDrawRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -149,13 +196,19 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
+  '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/bonus-task': typeof BonusTaskRoute
+  '/certification': typeof CertificationRoute
   '/chat': typeof ChatRoute
+  '/free-cash': typeof FreeCashRoute
+  '/lucky-draw': typeof LuckyDrawRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -169,6 +222,8 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
+  '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -176,7 +231,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/bonus-task'
+    | '/certification'
     | '/chat'
+    | '/free-cash'
+    | '/lucky-draw'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -190,11 +249,17 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/investment/$id'
     | '/admin/'
+    | '/api/public/hooks/generate-proof'
+    | '/api/public/hooks/paystack'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/bonus-task'
+    | '/certification'
     | '/chat'
+    | '/free-cash'
+    | '/lucky-draw'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -208,12 +273,18 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/investment/$id'
     | '/admin'
+    | '/api/public/hooks/generate-proof'
+    | '/api/public/hooks/paystack'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/auth'
+    | '/bonus-task'
+    | '/certification'
     | '/chat'
+    | '/free-cash'
+    | '/lucky-draw'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -227,19 +298,27 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/investment/$id'
     | '/admin/'
+    | '/api/public/hooks/generate-proof'
+    | '/api/public/hooks/paystack'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BonusTaskRoute: typeof BonusTaskRoute
+  CertificationRoute: typeof CertificationRoute
   ChatRoute: typeof ChatRoute
+  FreeCashRoute: typeof FreeCashRoute
+  LuckyDrawRoute: typeof LuckyDrawRoute
   OrdersRoute: typeof OrdersRoute
   RechargeRoute: typeof RechargeRoute
   TeamRoute: typeof TeamRoute
   WalletRoute: typeof WalletRoute
   WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
+  ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
+  ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -279,11 +358,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lucky-draw': {
+      id: '/lucky-draw'
+      path: '/lucky-draw'
+      fullPath: '/lucky-draw'
+      preLoaderRoute: typeof LuckyDrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-cash': {
+      id: '/free-cash'
+      path: '/free-cash'
+      fullPath: '/free-cash'
+      preLoaderRoute: typeof FreeCashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat': {
       id: '/chat'
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certification': {
+      id: '/certification'
+      path: '/certification'
+      fullPath: '/certification'
+      preLoaderRoute: typeof CertificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bonus-task': {
+      id: '/bonus-task'
+      path: '/bonus-task'
+      fullPath: '/bonus-task'
+      preLoaderRoute: typeof BonusTaskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -363,6 +470,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAiCreateRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/hooks/paystack': {
+      id: '/api/public/hooks/paystack'
+      path: '/api/public/hooks/paystack'
+      fullPath: '/api/public/hooks/paystack'
+      preLoaderRoute: typeof ApiPublicHooksPaystackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/generate-proof': {
+      id: '/api/public/hooks/generate-proof'
+      path: '/api/public/hooks/generate-proof'
+      fullPath: '/api/public/hooks/generate-proof'
+      preLoaderRoute: typeof ApiPublicHooksGenerateProofRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -392,13 +513,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  BonusTaskRoute: BonusTaskRoute,
+  CertificationRoute: CertificationRoute,
   ChatRoute: ChatRoute,
+  FreeCashRoute: FreeCashRoute,
+  LuckyDrawRoute: LuckyDrawRoute,
   OrdersRoute: OrdersRoute,
   RechargeRoute: RechargeRoute,
   TeamRoute: TeamRoute,
   WalletRoute: WalletRoute,
   WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
+  ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
+  ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

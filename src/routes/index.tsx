@@ -52,11 +52,11 @@ function Home() {
     queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "welfare").order("sort_order")).data ?? [],
   });
 
-  const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/wallet" | "/orders" | "/recharge"; badge?: number }> = [
+  const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/wallet" | "/orders" | "/recharge" | "/free-cash" | "/bonus-task" | "/certification" | "/lucky-draw"; badge?: number }> = [
     { label: "Message", icon: Headphones, to: "/chat", badge: 0 },
-    { label: "Free Cash", icon: Gift, to: "/wallet" },
-    { label: "Cash Benefits", icon: HandCoins, to: "/wallet" },
-    { label: "Certificate", icon: ClipboardCheck, to: "/orders" },
+    { label: "Free Cash", icon: Gift, to: "/free-cash" },
+    { label: "Cash Benefits", icon: HandCoins, to: "/bonus-task" },
+    { label: "Certificate", icon: ClipboardCheck, to: "/certification" },
     { label: "FAQ", icon: HelpCircle, to: "/chat" },
   ];
 
@@ -100,7 +100,7 @@ function Home() {
 
       {/* Lucky draw banner (admin uploadable) */}
       <div className="px-4 pt-5">
-        <Link to={(lucky?.link as "/wallet") ?? "/wallet"} className="block">
+        <Link to="/lucky-draw" className="block">
           <div className="bg-lucky-gradient relative h-28 overflow-hidden rounded-2xl shadow-md">
             {lucky?.image_url ? (
               <img src={lucky.image_url} alt={lucky.title ?? "Lucky Draw"} className="absolute inset-0 h-full w-full object-cover" />

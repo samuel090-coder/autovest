@@ -1,15 +1,14 @@
 {
-  "name": "autovest",
-  "short_name": "autovest",
+  "name": "InvestPro",
+  "short_name": "InvestPro",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "background_color": "#dc2626",
+  "theme_color": "#dc2626",
+  "description": "Earn daily income with InvestPro.",
   "icons": [
-    {
-      "src": "/favicon.ico",
-      "sizes": "64x64",
-      "type": "image/x-icon"
-    }
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" },
+    { "src": "/favicon.ico", "sizes": "192x192", "type": "image/x-icon", "purpose": "any" },
+    { "src": "/favicon.ico", "sizes": "512x512", "type": "image/x-icon", "purpose": "any" }
   ]
 }

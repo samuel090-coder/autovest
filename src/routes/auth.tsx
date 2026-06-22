@@ -186,24 +186,28 @@ async function handleLogin(e: React.FormEvent) {
             </Button>
           </form>
         )}
-{/* App download banner */}
-{appBanner?.image_url && (
-  <button type="button" onClick={handleInstall} className="mt-4 block w-full max-w-sm overflow-hidden rounded-2xl">
-    <img src={appBanner.image_url} alt={appBanner.title ?? "Download app"} className="w-full object-cover" />
-  </button>
-)}
-{!appBanner?.image_url && (
-  <div className="mt-4 w-full max-w-sm rounded-2xl bg-blue-50 p-4 text-center">
-    <p className="mb-2 text-sm text-gray-600">Download App and contact customer service for free cash!</p>
-    <button type="button" onClick={handleInstall} className="rounded-full bg-blue-600 px-8 py-2 text-white hover:bg-blue-700">APP Download</button>
-  </div>
-)}
-      {/* Support banner */}
-      {supportBanner?.image_url && (
-        <a href={supportBanner.link ?? "#"} className="mt-4 block overflow-hidden rounded-2xl">
-          <img src={supportBanner.image_url} alt={supportBanner.title ?? "Support"} className="w-full object-cover" />
-        </a>
-      )}
+
+        {/* App download (PWA install) */}
+        {appBanner?.image_url ? (
+          <button type="button" onClick={handleInstall} className="mt-4 block w-full overflow-hidden rounded-2xl">
+            <img src={appBanner.image_url} alt={appBanner.title ?? "Download app"} className="w-full object-cover" />
+          </button>
+        ) : (
+          <div className="mt-4 rounded-2xl bg-blue-50 p-4 text-center">
+            <p className="mb-2 text-sm text-gray-600">Install the app for the best experience</p>
+            <button type="button" onClick={handleInstall} className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
+              <Download className="h-4 w-4" /> APP Download
+            </button>
+          </div>
+        )}
+
+        {supportBanner?.image_url && (
+          <a href={supportBanner.link ?? "#"} className="mt-4 block overflow-hidden rounded-2xl">
+            <img src={supportBanner.image_url} alt={supportBanner.title ?? "Support"} className="w-full object-cover" />
+          </a>
+        )}
+      </div>
     </div>
   );
 }
+

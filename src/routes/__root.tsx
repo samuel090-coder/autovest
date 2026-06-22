@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { FlashSalePopup } from "@/components/flash-sale-popup";
+import { LotteryPopup } from "@/components/lottery-popup";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -120,10 +121,16 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <LotteryPopup />
       <FlashSalePopup />
       <Toaster />
     </QueryClientProvider>

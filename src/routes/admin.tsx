@@ -22,7 +22,7 @@ function AdminLayout() {
     { to: "/admin/investments", label: "Investments", icon: Boxes },
     { to: "/admin/ai-create", label: "AI Create", icon: Sparkles },
     { to: "/admin/banners", label: "Banners", icon: ImageIcon },
-    { to: "/admin/settings", label: "Popups & Recharge", icon: Settings },
+    { to: "/admin/settings", label: "Settings", icon: Settings },
     { to: "/admin/users", label: "Users", icon: Users },
     { to: "/admin/transactions", label: "Transactions", icon: Receipt },
   ];
