@@ -281,13 +281,18 @@ function RechargePage() {
       )}
 
       {/* Sticky CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-white px-4 py-3 shadow-lg">
+      <div className="fixed inset-x-0 bottom-0 z-30 space-y-2 border-t bg-white px-4 py-3 shadow-lg">
+        {paystackCfg?.enabled && paystackCfg?.public_key && (
+          <Button onClick={payWithPaystack} className="h-12 w-full rounded-full bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700">
+            Pay with card (Paystack) — ₦{Number(amount || 0).toLocaleString()}
+          </Button>
+        )}
         <Button
           onClick={() => submit.mutate()}
           disabled={submit.isPending}
           className="h-14 w-full rounded-full bg-gradient-to-r from-[#f5b740] to-[#e88a1a] text-base font-bold text-black hover:opacity-95"
         >
-          {submit.isPending ? "Submitting…" : "Top up now"}
+          {submit.isPending ? "Submitting…" : "Confirm manual transfer"}
         </Button>
       </div>
 
