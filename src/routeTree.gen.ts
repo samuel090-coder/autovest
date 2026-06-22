@@ -30,6 +30,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
+import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
 const WithdrawRoute = WithdrawRouteImport.update({
   id: '/withdraw',
@@ -136,6 +137,12 @@ const AdminAiCreateRoute = AdminAiCreateRouteImport.update({
   path: '/ai-create',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicHooksGenerateProofRoute =
+  ApiPublicHooksGenerateProofRouteImport.update({
+    id: '/api/public/hooks/generate-proof',
+    path: '/api/public/hooks/generate-proof',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -181,6 +189,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,6 +214,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/investment/$id'
     | '/admin/'
+    | '/api/public/hooks/generate-proof'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/investment/$id'
     | '/admin'
+    | '/api/public/hooks/generate-proof'
   id:
     | '__root__'
     | '/'
@@ -275,6 +287,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/investment/$id'
     | '/admin/'
+    | '/api/public/hooks/generate-proof'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -292,6 +305,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
+  ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -443,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAiCreateRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/hooks/generate-proof': {
+      id: '/api/public/hooks/generate-proof'
+      path: '/api/public/hooks/generate-proof'
+      fullPath: '/api/public/hooks/generate-proof'
+      preLoaderRoute: typeof ApiPublicHooksGenerateProofRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -483,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
+  ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
