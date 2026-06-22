@@ -83,6 +83,74 @@ export type Database = {
         }
         Relationships: []
       }
+      free_cash_codes: {
+        Row: {
+          amount: number
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_redemptions: number
+          redeemed_count: number
+        }
+        Insert: {
+          amount: number
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number
+          redeemed_count?: number
+        }
+        Update: {
+          amount?: number
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number
+          redeemed_count?: number
+        }
+        Relationships: []
+      }
+      free_cash_redemptions: {
+        Row: {
+          amount: number
+          code_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          code_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          code_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "free_cash_redemptions_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "free_cash_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investments: {
         Row: {
           category: Database["public"]["Enums"]["investment_category"]
@@ -143,6 +211,78 @@ export type Database = {
           price?: number
           sort_order?: number
           total_income?: number
+        }
+        Relationships: []
+      }
+      lucky_draw_spins: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lucky_draw_state: {
+        Row: {
+          base_spins: number
+          bonus_spins: number
+          claimed_at: string | null
+          created_at: string
+          expires_at: string
+          goal_amount: number
+          lottery_balance: number
+          referral_target: number
+          referrals_counted: number
+          spins_used: number
+          total_won: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          base_spins?: number
+          bonus_spins?: number
+          claimed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          goal_amount?: number
+          lottery_balance?: number
+          referral_target?: number
+          referrals_counted?: number
+          spins_used?: number
+          total_won?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          base_spins?: number
+          bonus_spins?: number
+          claimed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          goal_amount?: number
+          lottery_balance?: number
+          referral_target?: number
+          referrals_counted?: number
+          spins_used?: number
+          total_won?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -378,6 +518,39 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_proofs: {
+        Row: {
+          amount: number
+          caption: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_ai: boolean
+          phone_masked: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          caption: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_ai?: boolean
+          phone_masked: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          caption?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_ai?: boolean
+          phone_masked?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -391,6 +564,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      lucky_claim: { Args: never; Returns: Json }
+      lucky_spin: { Args: never; Returns: Json }
+      lucky_sync_referrals: { Args: never; Returns: Json }
+      redeem_free_cash: { Args: { _code: string }; Returns: Json }
       start_next_round: { Args: { _uinv_id: string }; Returns: Json }
     }
     Enums: {
