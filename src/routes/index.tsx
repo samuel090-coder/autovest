@@ -100,7 +100,7 @@ function Home() {
 
       {/* Lucky draw banner (admin uploadable) */}
       <div className="px-4 pt-5">
-        <Link to={(lucky?.link as "/wallet") ?? "/wallet"} className="block">
+        <Link to="/lucky-draw" className="block">
           <div className="bg-lucky-gradient relative h-28 overflow-hidden rounded-2xl shadow-md">
             {lucky?.image_url ? (
               <img src={lucky.image_url} alt={lucky.title ?? "Lucky Draw"} className="absolute inset-0 h-full w-full object-cover" />
