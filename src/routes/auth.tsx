@@ -191,21 +191,18 @@ async function handleLogin(e: React.FormEvent) {
             </Button>
           </form>
         )}
-      </div>
-{/* App download banner */}
+    {/* App download banner */}
 {appBanner?.image_url && (
   <button onClick={handleInstall} className="mt-4 block w-full overflow-hidden rounded-2xl">
     <img src={appBanner.image_url} alt={appBanner.title ?? "Download app"} className="w-full object-cover" />
   </button>
 )}
-      {!appBanner?.image_url && (
-        <div className="mt-4 flex items-center justify-between rounded-2xl bg-blue-600 px-5 py-5 text-white">
-          <div className="text-base font-semibold leading-tight">Download App and contact customer service for free cash!</div>
-          <Button asChild className="ml-3 shrink-0 rounded-full bg-amber-300 text-black hover:bg-amber-400">
-            <a href={appBanner?.link ?? "#"}><Download className="mr-1 h-4 w-4" /> APP Download</a>
-          </Button>
-        </div>
-      )}
+{!appBanner?.image_url && (
+  <div className="mt-4 rounded-2xl bg-blue-50 p-4 text-center">
+    <p className="mb-2 text-sm text-gray-600">Download App and contact customer service for free cash!</p>
+    <button onClick={handleInstall} className="rounded-full bg-blue-600 px-8 py-2 text-white hover:bg-blue-700">APP Download</button>
+  </div>
+)}
 
       {/* Support banner */}
       {supportBanner?.image_url && (
