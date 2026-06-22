@@ -285,13 +285,12 @@ function CashBenefitsEditor() {
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
     setUploading(true);
-    const path = `cash-benefits/${Date.now()}_${f.name}`;
-    const { error } = await supabase.storage.from("banners").upload(path, f, { upsert: true });
-    if (error) { toast.error(error.message); setUploading(false); return; }
-    const { data: pub } = supabase.storage.from("banners").getPublicUrl(path);
-    setVideo(pub.publicUrl);
+    try {
+      const url = await uploadAndGetUrl("banners", f, `cash-benefits/${Date.now()}_${f.name}`);
+      setVideo(url);
+      toast.success("Uploaded");
+    } catch (err: any) { toast.error(err.message); }
     setUploading(false);
-    toast.success("Uploaded");
   }
 
   return (
