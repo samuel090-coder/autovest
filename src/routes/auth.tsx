@@ -53,7 +53,25 @@ function AuthPage() {
     const r = p.get("ref");
     if (r) { setRegRef(r); setTab("register"); }
   }, []);
+const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
+useEffect(() => {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    setDeferredPrompt(e);
+  });
+}, []);
+
+async function handleInstall() {
+  if (!deferredPrompt) {
+    toast.info("Tap your browser menu → 'Add to Home Screen'");
+    return;
+  }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === "accepted") toast.success("App installed!");
+  setDeferredPrompt(null);
+}
   // Phone+password → email synth using the phone as account identifier
   function phoneEmail(p: string) {
     return `${p.replace(/[^0-9]/g, "")}@investpro.local`;
@@ -175,11 +193,11 @@ async function handleLogin(e: React.FormEvent) {
       </div>
 
       {/* App download banner */}
-      {appBanner?.image_url && (
-        <a href={appBanner.link ?? "#"} className="mt-4 block overflow-hidden rounded-2xl">
-          <img src={appBanner.image_url} alt={appBanner.title ?? "Download app"} className="w-full object-cover" />
-        </a>
-      )}
+{appBanner?.image_url && (
+  <a href__="#" onClick={handleInstall} className="mt-4 block overflow-hidden rounded-2xl">
+    <img src={appBanner.image_url} alt={appBanner.title ?? "Download app"} className="w-full object-cover" />
+  </a>
+)}
       {!appBanner?.image_url && (
         <div className="mt-4 flex items-center justify-between rounded-2xl bg-blue-600 px-5 py-5 text-white">
           <div className="text-base font-semibold leading-tight">Download App and contact customer service for free cash!</div>
