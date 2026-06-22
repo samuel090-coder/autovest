@@ -17,6 +17,7 @@ import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
 import { Route as FreeCashRouteImport } from './routes/free-cash'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as BonusTaskRouteImport } from './routes/bonus-task'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -67,6 +68,11 @@ const FreeCashRoute = FreeCashRouteImport.update({
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BonusTaskRoute = BonusTaskRouteImport.update({
+  id: '/bonus-task',
+  path: '/bonus-task',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/bonus-task': typeof BonusTaskRoute
   '/chat': typeof ChatRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/bonus-task': typeof BonusTaskRoute
   '/chat': typeof ChatRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/bonus-task': typeof BonusTaskRoute
   '/chat': typeof ChatRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/bonus-task'
     | '/chat'
     | '/free-cash'
     | '/lucky-draw'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/bonus-task'
     | '/chat'
     | '/free-cash'
     | '/lucky-draw'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/bonus-task'
     | '/chat'
     | '/free-cash'
     | '/lucky-draw'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BonusTaskRoute: typeof BonusTaskRoute
   ChatRoute: typeof ChatRoute
   FreeCashRoute: typeof FreeCashRoute
   LuckyDrawRoute: typeof LuckyDrawRoute
@@ -324,6 +337,13 @@ declare module '@tanstack/react-router' {
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bonus-task': {
+      id: '/bonus-task'
+      path: '/bonus-task'
+      fullPath: '/bonus-task'
+      preLoaderRoute: typeof BonusTaskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -432,6 +452,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  BonusTaskRoute: BonusTaskRoute,
   ChatRoute: ChatRoute,
   FreeCashRoute: FreeCashRoute,
   LuckyDrawRoute: LuckyDrawRoute,

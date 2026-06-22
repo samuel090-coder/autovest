@@ -40,7 +40,7 @@ function BonusTask() {
     queryKey: ["bonus-income", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data } = await supabase.from("transactions").select("*").eq("user_id", userId!).in("type", ["income", "claim", "lottery_claim", "free_cash"]).order("created_at", { ascending: false }).limit(30);
+      const { data } = await supabase.from("transactions").select("*").eq("user_id", userId!).in("type", ["income", "claim", "bonus", "referral"]).order("created_at", { ascending: false }).limit(30);
       return data ?? [];
     },
   });
