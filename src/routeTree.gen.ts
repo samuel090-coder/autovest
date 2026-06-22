@@ -30,6 +30,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
+import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
 import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
 const WithdrawRoute = WithdrawRouteImport.update({
@@ -137,6 +138,11 @@ const AdminAiCreateRoute = AdminAiCreateRouteImport.update({
   path: '/ai-create',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
+  id: '/api/public/hooks/paystack',
+  path: '/api/public/hooks/paystack',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksGenerateProofRoute =
   ApiPublicHooksGenerateProofRouteImport.update({
     id: '/api/public/hooks/generate-proof',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/investment/$id': typeof InvestmentIdRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
+  '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/investment/$id': typeof InvestmentIdRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
+  '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/investment/$id': typeof InvestmentIdRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
+  '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/investment/$id'
     | '/admin/'
     | '/api/public/hooks/generate-proof'
+    | '/api/public/hooks/paystack'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/investment/$id'
     | '/admin'
     | '/api/public/hooks/generate-proof'
+    | '/api/public/hooks/paystack'
   id:
     | '__root__'
     | '/'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/investment/$id'
     | '/admin/'
     | '/api/public/hooks/generate-proof'
+    | '/api/public/hooks/paystack'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,6 +318,7 @@ export interface RootRouteChildren {
   WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
+  ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAiCreateRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/hooks/paystack': {
+      id: '/api/public/hooks/paystack'
+      path: '/api/public/hooks/paystack'
+      fullPath: '/api/public/hooks/paystack'
+      preLoaderRoute: typeof ApiPublicHooksPaystackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/generate-proof': {
       id: '/api/public/hooks/generate-proof'
       path: '/api/public/hooks/generate-proof'
@@ -505,6 +525,7 @@ const rootRouteChildren: RootRouteChildren = {
   WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
+  ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
