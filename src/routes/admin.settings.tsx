@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
+import { uploadAndGetUrl } from "@/lib/storage";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
