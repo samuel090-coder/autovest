@@ -56,12 +56,31 @@ function RechargePage() {
     },
   });
 
+  const { data: paystackCfg } = useQuery({
+    queryKey: ["paystack-cfg"],
+    queryFn: async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "paystack").maybeSingle();
+      return (data?.value as { enabled?: boolean; public_key?: string; mode?: string }) ?? {};
+    },
+  });
+
   const presets = settings?.presets ?? [];
   const bonusMap = settings?.bonus_map ?? {};
   const channels = settings?.channels ?? [];
   const instructions = settings?.instructions ?? "";
 
   const channel = channels[selectedChannel];
+
+  // Inject Paystack inline script once
+  useEffect(() => {
+    if (!paystackCfg?.enabled) return;
+    if (document.getElementById("paystack-inline")) return;
+    const s = document.createElement("script");
+    s.id = "paystack-inline";
+    s.src = "https://js.paystack.co/v2/inline.js";
+    s.async = true;
+    document.head.appendChild(s);
+  }, [paystackCfg?.enabled]);
 
   const submit = useMutation({
     mutationFn: async () => {
@@ -84,6 +103,38 @@ function RechargePage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  async function payWithPaystack() {
+    if (!userId) return navigate({ to: "/auth" });
+    if (!paystackCfg?.public_key) return toast.error("Paystack not configured");
+    const amt = Number(amount);
+    if (!amt || amt < 100) return toast.error("Enter at least ₦100");
+    const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).maybeSingle();
+    const email = prof?.email || `${userId}@investpro.local`;
+    // 1) create pending tx
+    const { data: tx, error: txErr } = await supabase
+      .from("transactions")
+      .insert({ user_id: userId, type: "recharge", amount: amt, status: "pending", meta: { method: "paystack" } })
+      .select("id").single();
+    if (txErr || !tx) return toast.error(txErr?.message ?? "Could not start payment");
+    // 2) open inline
+    const w = window as any;
+    if (!w.PaystackPop) return toast.error("Paystack script not loaded yet — try again");
+    const popup = new w.PaystackPop();
+    popup.newTransaction({
+      key: paystackCfg.public_key,
+      email,
+      amount: amt * 100,
+      currency: "NGN",
+      metadata: { user_id: userId, transaction_id: tx.id },
+      onSuccess: () => {
+        toast.success("Payment received — wallet will update shortly");
+        qc.invalidateQueries({ queryKey: ["wallet"] });
+        setTimeout(() => navigate({ to: "/" }), 1500);
+      },
+      onCancel: () => toast.info("Payment cancelled"),
+    });
+  }
 
   const headerBg = useMemo(() => "bg-gradient-to-b from-[#fdf6e8] to-[#fdebd0]", []);
 
