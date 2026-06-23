@@ -13,17 +13,30 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           const key = process.env.LOVABLE_API_KEY;
           if (!key) return new Response("missing key", { status: 500 });
 
-          // 1) AI caption + amount via chat completion
+          // 1) Build a realistic Nigerian masked phone locally (valid MNO prefixes)
+          const ngPrefixes = [
+            "0803","0806","0810","0813","0814","0816","0703","0706","0903","0906",
+            "0805","0807","0815","0811","0705","0905","0915","0708","0802","0808",
+            "0812","0701","0902","0907","0901","0904","0912","0913","0916",
+          ];
+          const pfx = ngPrefixes[Math.floor(Math.random() * ngPrefixes.length)]; // 0XXX
+          const mid = String(Math.floor(100 + Math.random() * 900));            // 3 digits
+          const last = String(Math.floor(1000 + Math.random() * 9000));         // 4 digits
+          // Display as +234 XXX XXX **** XXX  → mask middle, show last 3
+          const intlPfx = "+234" + pfx.slice(1); // drop the leading 0
+          const masked = `${intlPfx}${mid.slice(0,1)}****${last.slice(-3)}`;
+
+          // 2) AI caption + amount via chat completion (amount/caption only)
           const captionRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
             body: JSON.stringify({
-              model: "google/gemini-3-flash-preview",
+              model: "google/gemini-2.5-flash",
               messages: [
                 {
                   role: "system",
                   content:
-                    "You generate a single fake but realistic withdrawal proof for a Nigerian investment app feed. Output strict JSON {\"amount\": number (between 1000 and 800000, varied), \"caption\": short string max 60 chars in English with one emoji, \"phone_last3\": 3 digits, \"phone_mid4\": 4 digits}. No prose, no markdown.",
+                    "You generate a single fake but realistic withdrawal proof for a Nigerian investment app feed. Output strict JSON {\"amount\": number (between 1500 and 750000, varied, end in 00 or 50), \"caption\": short string max 60 chars in English with one emoji, no phone numbers, no names}. No prose, no markdown.",
                 },
                 { role: "user", content: "Generate one." },
               ],
@@ -35,9 +48,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           const parsed = JSON.parse(cj.choices?.[0]?.message?.content ?? "{}");
           const amount = Number(parsed.amount ?? 5000);
           const caption = String(parsed.caption ?? "Thanks InvestPro 🎉").slice(0, 80);
-          const mid = String(parsed.phone_mid4 ?? "1234").slice(0, 4);
-          const last3 = String(parsed.phone_last3 ?? "567").slice(0, 3);
-          const masked = `+234${mid}****${last3}`;
+
 
           // 2) Tiny screenshot-style image via Gemini image (cheaper than gpt-image-2)
           let imageUrl: string | null = null;
