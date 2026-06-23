@@ -51,7 +51,8 @@ function CertificationPage() {
     if (!amount || !caption || !file) return toast.error("Image, amount and caption required");
     setSubmitting(true);
     try {
-      const url = await uploadAndGetUrl("avatars", file, `proofs/${userId}/${Date.now()}_${file.name}`);
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const url = await uploadAndGetUrl("avatars", file, `${userId}/proofs_${Date.now()}_${safeName}`);
       const digits = phone.replace(/[^0-9]/g, "");
       const masked = `+234${digits.slice(0, 3)}****${digits.slice(-3)}`;
       const { error } = await supabase.from("withdrawal_proofs").insert({
