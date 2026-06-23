@@ -351,3 +351,35 @@ function ProofsAdmin() {
     </Card>
   );
 }
+
+function ApkEditor() {
+  const { data, save } = useSetting("app_download");
+  const [url, setUrl] = useState("");
+  const [version, setVersion] = useState("");
+  const [uploading, setUploading] = useState(false);
+  useEffect(() => { if (!data) return; setUrl(data.url ?? ""); setVersion(data.version ?? ""); }, [data]);
+  async function onUpload(f: File | null) {
+    if (!f) return;
+    setUploading(true);
+    try {
+      const signed = await uploadAndGetUrl("banners", f, `apk/${Date.now()}_${f.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`);
+      setUrl(signed);
+      toast.success("APK uploaded — click Save");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setUploading(false); }
+  }
+  return (
+    <Card className="p-4 space-y-3">
+      <h3 className="font-semibold">APK download link</h3>
+      <p className="text-xs text-muted-foreground">
+        Paste a direct .apk URL OR upload the APK file. The login page's "APP Download" button
+        downloads this file without leaving the site.
+      </p>
+      <div><Label className="text-xs">Direct APK URL</Label><Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://…/app.apk" /></div>
+      <div><Label className="text-xs">Upload .apk</Label><Input type="file" accept=".apk,application/vnd.android.package-archive" onChange={(e) => onUpload(e.target.files?.[0] ?? null)} disabled={uploading} /></div>
+      <div><Label className="text-xs">Version (optional)</Label><Input value={version} onChange={(e) => setVersion(e.target.value)} placeholder="1.0.0" /></div>
+      <Button onClick={() => save.mutate({ url, version })} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
+    </Card>
+  );
+}
+
