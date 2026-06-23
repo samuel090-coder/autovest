@@ -47,27 +47,67 @@ function AuthPage() {
   const appBanner = byKey("login_app_download");
   const supportBanner = byKey("login_support");
 
+  const { data: appDl } = useQuery({
+    queryKey: ["app-download"],
+    queryFn: async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "app_download").maybeSingle();
+      return (data?.value as { url?: string; version?: string } | null) ?? null;
+    },
+  });
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const p = new URLSearchParams(window.location.search);
     const r = p.get("ref");
     if (r) { setRegRef(r); setTab("register"); }
   }, []);
-const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
-useEffect(() => {
-  const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
-  window.addEventListener("beforeinstallprompt", handler);
-  return () => window.removeEventListener("beforeinstallprompt", handler);
-}, []);
+  useEffect(() => {
+    const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
 
-async function handleInstall() {
-  if (!deferredPrompt) { toast.info("Tap browser menu → 'Add to Home Screen'"); return; }
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === "accepted") toast.success("App installed!");
-  setDeferredPrompt(null);
+  async function handleInstall() {
+    // 1) If admin configured an APK URL, download it in-page (no navigation)
+    const apkUrl = appDl?.url?.trim();
+    if (apkUrl) {
+      try {
+        toast.info("Downloading app…");
+        const res = await fetch(apkUrl, { mode: "cors" });
+        if (!res.ok) throw new Error("download failed");
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = objUrl;
+        a.download = `InvestPro${appDl?.version ? "-" + appDl.version : ""}.apk`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(objUrl), 60_000);
+        toast.success("Download started");
+        return;
+      } catch {
+        // CORS or network blocked direct fetch → fall back to a forced-download link
+        const a = document.createElement("a");
+        a.href = apkUrl;
+        a.download = `InvestPro${appDl?.version ? "-" + appDl.version : ""}.apk`;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return;
+      }
     }
+    // 2) Otherwise fall back to native PWA install prompt
+    if (!deferredPrompt) { toast.info("Tap browser menu → 'Add to Home Screen'"); return; }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") toast.success("App installed!");
+    setDeferredPrompt(null);
+  }
+
   // Phone+password → email synth using the phone as account identifier
   function phoneEmail(p: string) {
     return `${p.replace(/[^0-9]/g, "")}@investpro.local`;
