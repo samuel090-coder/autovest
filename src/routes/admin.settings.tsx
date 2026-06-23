@@ -24,6 +24,7 @@ function AdminSettings() {
         <TabsTrigger value="popups">Popups</TabsTrigger>
         <TabsTrigger value="recharge">Recharge</TabsTrigger>
         <TabsTrigger value="paystack">Paystack</TabsTrigger>
+        <TabsTrigger value="apk">APK download</TabsTrigger>
         <TabsTrigger value="lucky">Lucky draw</TabsTrigger>
         <TabsTrigger value="freecash">Free cash codes</TabsTrigger>
         <TabsTrigger value="bonus">Cash Benefits</TabsTrigger>
@@ -32,11 +33,13 @@ function AdminSettings() {
       <TabsContent value="popups" className="space-y-4"><Announce1 /><Announce2 /></TabsContent>
       <TabsContent value="recharge"><RechargeEditor /></TabsContent>
       <TabsContent value="paystack"><PaystackEditor /></TabsContent>
+      <TabsContent value="apk"><ApkEditor /></TabsContent>
       <TabsContent value="lucky"><LuckyEditor /></TabsContent>
       <TabsContent value="freecash"><FreeCashAdmin /></TabsContent>
       <TabsContent value="bonus"><CashBenefitsEditor /></TabsContent>
       <TabsContent value="proofs"><ProofsAdmin /></TabsContent>
     </Tabs>
+
   );
 }
 
