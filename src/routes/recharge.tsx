@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Info, Phone, Copy } from "lucide-react";
+import { ArrowLeft, Info, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -13,12 +13,10 @@ export const Route = createFileRoute("/recharge")({
   component: RechargePage,
 });
 
-type Channel = { name: string; bank?: string; account_name?: string; account_number?: string; color?: string };
 type RechargeSettings = {
   presets?: number[];
   bonus_map?: Record<string, string | number>;
   instructions?: string;
-  channels?: Channel[];
 };
 
 function RechargePage() {
@@ -27,7 +25,6 @@ function RechargePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState<string>("66000");
-  const [selectedChannel, setSelectedChannel] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -66,10 +63,7 @@ function RechargePage() {
 
   const presets = settings?.presets ?? [];
   const bonusMap = settings?.bonus_map ?? {};
-  const channels = settings?.channels ?? [];
   const instructions = settings?.instructions ?? "";
-
-  const channel = channels[selectedChannel];
 
   // Inject Paystack inline script once
   useEffect(() => {
@@ -82,31 +76,15 @@ function RechargePage() {
     document.head.appendChild(s);
   }, [paystackCfg?.enabled]);
 
-  const submit = useMutation({
-    mutationFn: async () => {
-      if (!userId) throw new Error("Not signed in");
-      const amt = Number(amount);
-      if (!amt || amt < 1) throw new Error("Enter a valid amount");
-      const { error } = await supabase.from("transactions").insert({
-        user_id: userId,
-        type: "recharge",
-        amount: amt,
-        status: "pending",
-        meta: { channel: channel?.name ?? null, account_number: channel?.account_number ?? null },
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Top-up request submitted. Funds will reflect after confirmation.");
-      qc.invalidateQueries({ queryKey: ["wallet"] });
-      navigate({ to: "/" });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  // (removed manual-transfer submission — Paystack is the only method)
+  const submit = useMutation({ mutationFn: async () => {}, onSuccess: () => {}, onError: () => {} });
+  void submit;
 
   async function payWithPaystack() {
     if (!userId) return navigate({ to: "/auth" });
-    if (!paystackCfg?.public_key) return toast.error("Paystack not configured");
+    if (!paystackCfg?.public_key || !paystackCfg.public_key.startsWith("pk_")) {
+      return toast.error("Payments not configured yet. Please contact support.");
+    }
     const amt = Number(amount);
     if (!amt || amt < 100) return toast.error("Enter at least ₦100");
     const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).maybeSingle();
