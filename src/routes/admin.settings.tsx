@@ -20,16 +20,18 @@ export const Route = createFileRoute("/admin/settings")({
 function AdminSettings() {
   return (
     <Tabs defaultValue="popups" className="space-y-4">
-      <TabsList className="flex w-full flex-wrap">
-        <TabsTrigger value="popups">Popups</TabsTrigger>
-        <TabsTrigger value="recharge">Recharge</TabsTrigger>
-        <TabsTrigger value="paystack">Paystack</TabsTrigger>
-        <TabsTrigger value="apk">APK download</TabsTrigger>
-        <TabsTrigger value="lucky">Lucky draw</TabsTrigger>
-        <TabsTrigger value="freecash">Free cash codes</TabsTrigger>
-        <TabsTrigger value="bonus">Cash Benefits</TabsTrigger>
-        <TabsTrigger value="proofs">Withdrawal proofs</TabsTrigger>
-      </TabsList>
+      <div className="-mx-2 overflow-x-auto px-2">
+        <TabsList className="inline-flex w-max flex-nowrap gap-1">
+          <TabsTrigger value="popups">Popups</TabsTrigger>
+          <TabsTrigger value="recharge">Recharge</TabsTrigger>
+          <TabsTrigger value="paystack">Paystack</TabsTrigger>
+          <TabsTrigger value="apk">APK</TabsTrigger>
+          <TabsTrigger value="lucky">Lucky draw</TabsTrigger>
+          <TabsTrigger value="freecash">Free cash</TabsTrigger>
+          <TabsTrigger value="bonus">Bonus</TabsTrigger>
+          <TabsTrigger value="proofs">Proofs</TabsTrigger>
+        </TabsList>
+      </div>
       <TabsContent value="popups" className="space-y-4"><Announce1 /><Announce2 /></TabsContent>
       <TabsContent value="recharge"><RechargeEditor /></TabsContent>
       <TabsContent value="paystack"><PaystackEditor /></TabsContent>
@@ -147,24 +149,32 @@ function PaystackEditor() {
   const [publicKey, setPublicKey] = useState("");
   const [mode, setMode] = useState<"live" | "test">("live");
   useEffect(() => { if (!data) return; setEnabled(!!data.enabled); setPublicKey(data.public_key ?? ""); setMode((data.mode ?? "live") as any); }, [data]);
+  const webhookUrl = typeof window !== "undefined" ? `${window.location.origin}/api/public/hooks/paystack` : "/api/public/hooks/paystack";
   return (
     <Card className="p-4 space-y-3">
       <h3 className="font-semibold">Paystack payment integration</h3>
       <p className="text-xs text-muted-foreground">
-        Paste your Paystack <b>public key</b> below (starts with <code>pk_live_</code> or <code>pk_test_</code>).
-        The secret key & webhook secret are added separately via project Secrets.
-        Webhook endpoint to set in Paystack: <code className="break-all">/api/public/hooks/paystack</code>
+        Paste your Paystack <b>public key</b> below — it must start with <code>pk_live_</code> (live) or <code>pk_test_</code> (sandbox).
+        If you see "Please enter a valid Key" on the Paystack checkout it means the key here is wrong, blank, or doesn't match the mode.
       </p>
       <div className="flex items-center justify-between"><Label>Enabled</Label><Switch checked={enabled} onCheckedChange={setEnabled} /></div>
-      <div><Label className="text-xs">Public key</Label><Input value={publicKey} onChange={(e) => setPublicKey(e.target.value)} placeholder="pk_live_…" /></div>
+      <div><Label className="text-xs">Public key</Label><Input value={publicKey} onChange={(e) => setPublicKey(e.target.value.trim())} placeholder="pk_live_…" /></div>
       <div className="flex items-center gap-2"><Label>Mode</Label>
         <select value={mode} onChange={(e) => setMode(e.target.value as any)} className="rounded border px-2 py-1 text-sm">
           <option value="live">Live</option><option value="test">Test</option>
         </select>
       </div>
       <Button onClick={() => save.mutate({ enabled, public_key: publicKey, mode })} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
-      <div className="mt-2 rounded bg-amber-50 p-3 text-xs">
-        Add <code>PAYSTACK_SECRET_KEY</code> in project Secrets so the webhook can verify signatures.
+
+      <div className="mt-4 rounded-lg border bg-muted/40 p-3">
+        <div className="text-xs font-semibold">Webhook URL (paste this into Paystack → Settings → API Keys & Webhooks)</div>
+        <div className="mt-1 flex items-center gap-2">
+          <code className="flex-1 break-all rounded bg-background p-2 text-[11px]">{webhookUrl}</code>
+          <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(webhookUrl); toast.success("Webhook URL copied"); }}>Copy</Button>
+        </div>
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Set the same URL as your Webhook URL and Test Webhook URL. The <code>PAYSTACK_SECRET_KEY</code> server secret is already saved — it's used to verify signatures.
+        </p>
       </div>
     </Card>
   );

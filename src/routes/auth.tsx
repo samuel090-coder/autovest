@@ -177,27 +177,27 @@ async function handleLogin(e: React.FormEvent) {
 
         {tab === "login" ? (
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="flex items-center gap-3 rounded-xl bg-gray-100 px-4 py-3">
-              <Phone className="h-5 w-5 text-red-500" />
-              <span className="text-foreground/70">+234</span>
+            <div className="flex h-12 items-center gap-3 rounded-xl bg-gray-100 px-4">
+              <Phone className="h-5 w-5 shrink-0 text-red-500" />
+              <span className="shrink-0 text-foreground/70">+234</span>
               <Input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Phone number"
                 inputMode="tel"
                 required
-                className="border-0 bg-transparent px-0 focus-visible:ring-0"
+                className="h-full flex-1 border-0 bg-transparent px-0 text-base focus-visible:ring-0"
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-gray-100 px-4 py-3">
-              <Lock className="h-5 w-5 text-red-500" />
+            <div className="flex h-12 items-center gap-3 rounded-xl bg-gray-100 px-4">
+              <Lock className="h-5 w-5 shrink-0 text-red-500" />
               <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 required
-                className="border-0 bg-transparent px-0 focus-visible:ring-0"
+                className="h-full flex-1 border-0 bg-transparent px-0 text-base focus-visible:ring-0"
               />
             </div>
             <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl bg-red-600 text-base font-bold hover:bg-red-700">
