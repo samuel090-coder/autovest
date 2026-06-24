@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Info, Phone, Copy } from "lucide-react";
+import { ArrowLeft, Info, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -13,12 +13,10 @@ export const Route = createFileRoute("/recharge")({
   component: RechargePage,
 });
 
-type Channel = { name: string; bank?: string; account_name?: string; account_number?: string; color?: string };
 type RechargeSettings = {
   presets?: number[];
   bonus_map?: Record<string, string | number>;
   instructions?: string;
-  channels?: Channel[];
 };
 
 function RechargePage() {
@@ -27,7 +25,6 @@ function RechargePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState<string>("66000");
-  const [selectedChannel, setSelectedChannel] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -66,10 +63,7 @@ function RechargePage() {
 
   const presets = settings?.presets ?? [];
   const bonusMap = settings?.bonus_map ?? {};
-  const channels = settings?.channels ?? [];
   const instructions = settings?.instructions ?? "";
-
-  const channel = channels[selectedChannel];
 
   // Inject Paystack inline script once
   useEffect(() => {
@@ -82,31 +76,13 @@ function RechargePage() {
     document.head.appendChild(s);
   }, [paystackCfg?.enabled]);
 
-  const submit = useMutation({
-    mutationFn: async () => {
-      if (!userId) throw new Error("Not signed in");
-      const amt = Number(amount);
-      if (!amt || amt < 1) throw new Error("Enter a valid amount");
-      const { error } = await supabase.from("transactions").insert({
-        user_id: userId,
-        type: "recharge",
-        amount: amt,
-        status: "pending",
-        meta: { channel: channel?.name ?? null, account_number: channel?.account_number ?? null },
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Top-up request submitted. Funds will reflect after confirmation.");
-      qc.invalidateQueries({ queryKey: ["wallet"] });
-      navigate({ to: "/" });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  // (removed manual-transfer submission — Paystack is the only method)
 
   async function payWithPaystack() {
     if (!userId) return navigate({ to: "/auth" });
-    if (!paystackCfg?.public_key) return toast.error("Paystack not configured");
+    if (!paystackCfg?.public_key || !paystackCfg.public_key.startsWith("pk_")) {
+      return toast.error("Payments not configured yet. Please contact support.");
+    }
     const amt = Number(amount);
     if (!amt || amt < 100) return toast.error("Enter at least ₦100");
     const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).maybeSingle();
@@ -215,84 +191,42 @@ function RechargePage() {
         </div>
       </div>
 
-      {/* Payment channels */}
+      {/* Paystack-only info card */}
       <div className="px-4 pt-5">
-        <h3 className="mb-2 text-base font-bold">Payment Channel</h3>
-        <div className="space-y-2">
-          {channels.map((c, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setSelectedChannel(i)}
-              className={`flex w-full items-center justify-between rounded-xl border-2 bg-white p-3 text-left ${
-                selectedChannel === i ? "border-red-500" : "border-transparent"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-full text-white font-bold" style={{ background: c.color ?? "#e53935" }}>
-                  {c.name.slice(0, 2).toUpperCase()}
-                </div>
-                <div>
-                  <div className="font-semibold">{c.name}</div>
-                  {c.bank && <div className="text-xs text-muted-foreground">{c.bank}</div>}
-                </div>
-              </div>
-              {selectedChannel === i && c.account_number && (
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="font-mono">{c.account_number}</span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(c.account_number!);
-                      toast.success("Account number copied");
-                    }}
-                    className="rounded p-1 hover:bg-muted"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              )}
-            </button>
-          ))}
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-2 text-base font-bold">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-600 text-white">P</span>
+            Paystack — secure payment
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We accept payments via Paystack. You can pay using your <b>bank card (Visa / Mastercard / Verve)</b> <i>or</i> via <b>bank transfer</b> — Paystack will show you both options on the payment page. Funds reflect instantly after confirmation.
+          </p>
+          {!paystackCfg?.enabled || !paystackCfg?.public_key ? (
+            <div className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+              Payments are temporarily disabled. Please contact support.
+            </div>
+          ) : null}
         </div>
       </div>
-
-      {/* Selected account details */}
-      {channel && channel.account_number && (
-        <div className="px-4 pt-3">
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <div className="text-xs text-muted-foreground">Transfer to:</div>
-            <div className="mt-1 text-sm">
-              <div><span className="font-semibold">Bank:</span> {channel.bank}</div>
-              <div><span className="font-semibold">Account name:</span> {channel.account_name}</div>
-              <div className="font-mono text-base font-bold">{channel.account_number}</div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Instructions */}
       {instructions && (
         <div className="px-4 pt-5">
-          <div className="text-base font-bold">Top-up Steps:</div>
+          <div className="text-base font-bold">Notes:</div>
           <div className="mt-2 whitespace-pre-wrap text-[15px] leading-relaxed">{instructions}</div>
         </div>
       )}
 
-      {/* Sticky CTA */}
+      {/* Sticky CTA — Paystack only */}
       <div className="fixed inset-x-0 bottom-0 z-30 space-y-2 border-t bg-white px-4 py-3 shadow-lg">
-        {paystackCfg?.enabled && paystackCfg?.public_key && (
-          <Button onClick={payWithPaystack} className="h-12 w-full rounded-full bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700">
-            Pay with card (Paystack) — ₦{Number(amount || 0).toLocaleString()}
-          </Button>
-        )}
         <Button
-          onClick={() => submit.mutate()}
-          disabled={submit.isPending}
-          className="h-14 w-full rounded-full bg-gradient-to-r from-[#f5b740] to-[#e88a1a] text-base font-bold text-black hover:opacity-95"
+          onClick={payWithPaystack}
+          disabled={!paystackCfg?.enabled || !paystackCfg?.public_key}
+          className="h-14 w-full rounded-full bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
         >
-          {submit.isPending ? "Submitting…" : "Confirm manual transfer"}
+          {paystackCfg?.enabled && paystackCfg?.public_key
+            ? `Pay ₦${Number(amount || 0).toLocaleString()} — Card or Bank Transfer`
+            : "Payments unavailable"}
         </Button>
       </div>
 

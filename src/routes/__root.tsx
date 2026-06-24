@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { FlashSalePopup } from "@/components/flash-sale-popup";
 import { LotteryPopup } from "@/components/lottery-popup";
+import { LiveCreditAlerts } from "@/components/live-credit-alerts";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -131,6 +132,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <LotteryPopup />
+      <LiveCreditAlerts />
       <FlashSalePopup />
       <Toaster />
     </QueryClientProvider>

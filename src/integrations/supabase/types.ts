@@ -286,6 +286,36 @@ export type Database = {
         }
         Relationships: []
       }
+      post_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          image_url: string | null
+          kind: string
+          meta: Json
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          kind: string
+          meta?: Json
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          kind?: string
+          meta?: Json
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -582,6 +612,8 @@ export type Database = {
         | "referral"
         | "claim"
         | "bonus"
+        | "free_cash"
+        | "lottery_claim"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -720,6 +752,8 @@ export const Constants = {
         "referral",
         "claim",
         "bonus",
+        "free_cash",
+        "lottery_claim",
       ],
     },
   },
