@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Info, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -77,8 +77,6 @@ function RechargePage() {
   }, [paystackCfg?.enabled]);
 
   // (removed manual-transfer submission — Paystack is the only method)
-  const submit = useMutation({ mutationFn: async () => {}, onSuccess: () => {}, onError: () => {} });
-  void submit;
 
   async function payWithPaystack() {
     if (!userId) return navigate({ to: "/auth" });
