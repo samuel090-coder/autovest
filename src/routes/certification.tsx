@@ -85,16 +85,22 @@ function CertificationPage() {
       <div className="m-4 flex items-center gap-4 rounded-2xl bg-gradient-to-r from-orange-200 to-yellow-100 p-4 shadow-sm">
         <div className="flex-1">
           <div className="text-base font-extrabold uppercase leading-tight tracking-tight">Upload your own withdrawal voucher to get cash rewards</div>
+          <div className="mt-1 rounded-md bg-emerald-100 px-2 py-1 text-[12px] font-semibold text-emerald-800">
+            🎉 You will earn ₦70 once you post a valid screenshot of your payment withdrawal.
+          </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="mt-3 rounded-full bg-red-600 hover:bg-red-700"><Upload className="mr-2 h-4 w-4" /> Upload proof</Button>
             </DialogTrigger>
             <DialogContent className="max-w-sm">
               <div className="text-base font-semibold">Upload withdrawal proof</div>
+              <div className="rounded-md bg-amber-50 p-2 text-[12px] text-amber-900">
+                Post a clear screenshot of a real bank/transfer withdrawal. Once approved you'll be credited <b>₦70</b> to your wallet. Fake or duplicate proofs are removed.
+              </div>
               <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
               <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ""))} inputMode="numeric" placeholder="Amount (₦)" />
               <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption (e.g. Thanks InvestPro!)" maxLength={140} />
-              <Button onClick={submit} disabled={submitting} className="w-full bg-red-600 hover:bg-red-700">{submitting ? "Posting…" : "Post"}</Button>
+              <Button onClick={submit} disabled={submitting} className="w-full bg-red-600 hover:bg-red-700">{submitting ? "Posting…" : "Post for ₦70 reward"}</Button>
             </DialogContent>
           </Dialog>
         </div>
