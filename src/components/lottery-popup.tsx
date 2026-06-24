@@ -13,6 +13,9 @@ export function LotteryPopup() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Never show on auth/admin/api routes — only inside the app
+    const p = window.location.pathname;
+    if (p.startsWith("/auth") || p.startsWith("/admin") || p.startsWith("/api")) return;
     if (sessionStorage.getItem("lottery_pop_seen") === "1") return;
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setOpen(true);
