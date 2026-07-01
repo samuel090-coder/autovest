@@ -54,6 +54,12 @@ If a field is missing, infer a reasonable value. Numbers must be plain integers/
 
     if (!res.ok) {
       const errText = await res.text();
+      if (res.status === 402) {
+        throw new Error("AI credits exhausted on the workspace. Please top up Lovable AI credits in Settings → Workspace → Usage, then retry. In the meantime you can fill the form manually.");
+      }
+      if (res.status === 429) {
+        throw new Error("AI is rate-limited right now — wait ~30 seconds and try again.");
+      }
       throw new Error(`AI gateway error ${res.status}: ${errText}`);
     }
 
