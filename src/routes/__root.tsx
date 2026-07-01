@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { FlashSalePopup } from "@/components/flash-sale-popup";
 import { LotteryPopup } from "@/components/lottery-popup";
 import { LiveCreditAlerts } from "@/components/live-credit-alerts";
+import { CongratsPopup } from "@/components/congrats-popup";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
