@@ -62,6 +62,9 @@ function InvestmentDetails() {
       toast.success("Investment successful");
       qc.invalidateQueries({ queryKey: ["wallet"] });
       setOpen(false);
+      import("@/components/congrats-popup").then(({ fireCongrats }) =>
+        fireCongrats({ title: "Investment Activated!", subtitle: `${inv?.name ?? "Your plan"} is now earning`, amount: inv?.daily_income })
+      );
       navigate({ to: "/orders" });
     },
     onError: (e: Error) => toast.error(e.message),

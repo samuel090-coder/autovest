@@ -14,6 +14,7 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as MessageRouteImport } from './routes/message'
 import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
 import { Route as FreeCashRouteImport } from './routes/free-cash'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -56,6 +57,11 @@ const RechargeRoute = RechargeRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessageRoute = MessageRouteImport.update({
+  id: '/message',
+  path: '/message',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LuckyDrawRoute = LuckyDrawRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
+  '/message': typeof MessageRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
+  '/message': typeof MessageRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
+  '/message': typeof MessageRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/free-cash'
     | '/lucky-draw'
+    | '/message'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/free-cash'
     | '/lucky-draw'
+    | '/message'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/free-cash'
     | '/lucky-draw'
+    | '/message'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   FreeCashRoute: typeof FreeCashRoute
   LuckyDrawRoute: typeof LuckyDrawRoute
+  MessageRoute: typeof MessageRoute
   OrdersRoute: typeof OrdersRoute
   RechargeRoute: typeof RechargeRoute
   TeamRoute: typeof TeamRoute
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/message': {
+      id: '/message'
+      path: '/message'
+      fullPath: '/message'
+      preLoaderRoute: typeof MessageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lucky-draw': {
@@ -518,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   FreeCashRoute: FreeCashRoute,
   LuckyDrawRoute: LuckyDrawRoute,
+  MessageRoute: MessageRoute,
   OrdersRoute: OrdersRoute,
   RechargeRoute: RechargeRoute,
   TeamRoute: TeamRoute,

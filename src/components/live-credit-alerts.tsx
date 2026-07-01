@@ -34,8 +34,8 @@ export function LiveCreditAlerts() {
 
   // Duplicate so the marquee loops seamlessly
   const items = [...proofs, ...proofs];
-  // Speed: ~28s per screen worth. Longer strip => slower feel = smoother.
-  const durationSec = Math.max(35, proofs.length * 4);
+  // Faster, more professional pace
+  const durationSec = Math.max(18, proofs.length * 2.2);
 
   return (
     <div
