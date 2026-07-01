@@ -135,6 +135,7 @@ function RootComponent() {
       <LotteryPopup />
       <LiveCreditAlerts />
       <FlashSalePopup />
+      <CongratsPopup />
       <Toaster />
     </QueryClientProvider>
   );
