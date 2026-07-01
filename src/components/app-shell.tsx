@@ -37,7 +37,7 @@ export function BottomNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background pb-20">
+    <div className="mx-auto min-h-screen max-w-md bg-background pb-20 pt-[30px]">
       {children}
     </div>
   );
