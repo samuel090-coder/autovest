@@ -134,7 +134,7 @@ function Home() {
                     <Link to="/investment/$id" params={{ id: hero.id }} className="block">
                       <div className="overflow-hidden rounded-xl bg-card">
                         <div className="relative aspect-[16/10] w-full bg-muted">
-                          {hero.image_url && <img src={hero.image_url} alt={hero.name} className="h-full w-full object-cover" />}
+                          {hero.image_url && <img src={hero.image_url} alt={hero.name} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />}
                           {hero.is_hot && (<span className="absolute left-3 top-3 rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">HOT</span>)}
                         </div>
                         <div className="p-4">
