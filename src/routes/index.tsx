@@ -53,7 +53,7 @@ function Home() {
   });
 
   const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/wallet" | "/orders" | "/recharge" | "/free-cash" | "/bonus-task" | "/certification" | "/lucky-draw"; badge?: number }> = [
-    { label: "Message", icon: Headphones, to: "/chat", badge: 0 },
+    { label: "Message", icon: Headphones, to: "/message", badge: 0 },
     { label: "Free Cash", icon: Gift, to: "/free-cash" },
     { label: "Cash Benefits", icon: HandCoins, to: "/bonus-task" },
     { label: "Certificate", icon: ClipboardCheck, to: "/certification" },
