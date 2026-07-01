@@ -101,14 +101,20 @@ function Home() {
       {/* Lucky draw banner (admin uploadable) */}
       <div className="px-4 pt-5">
         <Link to="/lucky-draw" className="block">
-          <div className="bg-lucky-gradient relative h-28 overflow-hidden rounded-2xl shadow-md">
+          <div className="relative overflow-hidden rounded-2xl shadow-md bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 ring-2 ring-yellow-300/60">
             {lucky?.image_url ? (
-              <img src={lucky.image_url} alt={lucky.title ?? "Lucky Draw"} className="absolute inset-0 h-full w-full object-cover" />
+              <img src={lucky.image_url} alt={lucky.title ?? "Lucky Draw"} className="absolute inset-0 h-full w-full object-cover opacity-80" onError={(e) => ((e.currentTarget.style.display = "none"))} />
             ) : null}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/35 to-transparent" />
-            <div className="relative p-5 text-white">
-              <div className="text-2xl font-extrabold tracking-tight drop-shadow">{lucky?.title ?? "LUCKY DRAW"}</div>
-              <div className="mt-1 text-sm opacity-95">{lucky?.subtitle ?? "Click here to enter the lottery tour"}</div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent" />
+            <div className="relative flex items-center justify-between gap-3 p-4">
+              <div className="flex-1 text-white">
+                <div className="text-2xl font-extrabold tracking-tight drop-shadow-[0_2px_0_rgba(0,0,0,0.35)]">🎰 LUCKY DRAW</div>
+                <div className="mt-1 text-sm font-medium opacity-95">{lucky?.subtitle ?? "Spin & win up to ₦100,000"}</div>
+                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur">Tap to play →</div>
+              </div>
+              <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full bg-gradient-to-br from-yellow-200 to-orange-500 ring-4 ring-white/50 shadow-lg">
+                <span className="text-2xl">🎁</span>
+              </div>
             </div>
           </div>
         </Link>

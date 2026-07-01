@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
 
 /**
- * Floating live credit-alert toast on the left/side of the screen.
- * Cycles through the latest withdrawal_proofs entries, one every 6-10s.
- * Hides on /auth, /admin and /api routes.
+ * Top-of-site LED-style marquee showing recent withdrawal notifications.
+ * Scrolls smoothly right-to-left in a continuous loop like a stock ticker /
+ * live LED sign. Hidden on /auth, /admin and /api routes.
  */
 export function LiveCreditAlerts() {
-  const [idx, setIdx] = useState(0);
-  const [dismissed, setDismissed] = useState(false);
   const [show, setShow] = useState(false);
 
   const { data: proofs = [] } = useQuery({
@@ -20,7 +17,7 @@ export function LiveCreditAlerts() {
         .from("withdrawal_proofs")
         .select("phone_masked, amount, caption, created_at")
         .order("created_at", { ascending: false })
-        .limit(40);
+        .limit(30);
       return data ?? [];
     },
     refetchInterval: 120_000,
@@ -30,41 +27,43 @@ export function LiveCreditAlerts() {
     if (typeof window === "undefined") return;
     const p = window.location.pathname;
     if (p.startsWith("/auth") || p.startsWith("/admin") || p.startsWith("/api")) return;
-    if (proofs.length === 0) return;
     setShow(true);
-    const tick = () => setIdx((i) => (i + 1) % proofs.length);
-    const t = setInterval(tick, 6000 + Math.floor(Math.random() * 4000));
-    return () => clearInterval(t);
-  }, [proofs.length]);
+  }, []);
 
-  if (!show || dismissed || proofs.length === 0) return null;
-  const p = proofs[idx];
-  const seconds = Math.max(8, Math.floor((Date.now() - new Date(p.created_at).getTime()) / 1000));
-  const ago = seconds < 60 ? `${seconds}s ago` : seconds < 3600 ? `${Math.floor(seconds / 60)}m ago` : `${Math.floor(seconds / 3600)}h ago`;
+  if (!show || proofs.length === 0) return null;
+
+  // Duplicate so the marquee loops seamlessly
+  const items = [...proofs, ...proofs];
+  // Speed: ~28s per screen worth. Longer strip => slower feel = smoother.
+  const durationSec = Math.max(35, proofs.length * 4);
 
   return (
     <div
-      className="pointer-events-auto fixed left-2 top-24 z-[80] max-w-[78vw] sm:max-w-xs animate-in slide-in-from-left-2 fade-in"
+      className="pointer-events-none fixed left-0 right-0 top-0 z-[70] overflow-hidden border-b border-emerald-900/40 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-950 shadow-md"
       role="status"
       aria-live="polite"
+      style={{ height: 30 }}
     >
-      <div className="relative flex items-start gap-2 rounded-xl bg-white/95 p-2.5 pr-7 shadow-lg ring-1 ring-black/10 backdrop-blur">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-100 text-lg">💸</div>
-        <div className="min-w-0 flex-1 text-[12px] leading-tight">
-          <div className="truncate font-semibold text-foreground">@{p.phone_masked}</div>
-          <div className="font-bold text-emerald-700">
-            Withdrawal of ₦{Number(p.amount).toLocaleString()} successful!
+      <div
+        className="flex h-full items-center gap-8 whitespace-nowrap will-change-transform"
+        style={{ animation: `led-scroll ${durationSec}s linear infinite` }}
+      >
+        {items.map((p, i) => (
+          <div key={i} className="flex items-center gap-2 text-[12px] font-semibold">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-300 shadow-[0_0_8px_#6ee7b7]" />
+            <span className="text-emerald-100">{p.phone_masked}</span>
+            <span className="text-yellow-300">just withdrew</span>
+            <span className="text-white">₦{Number(p.amount).toLocaleString()}</span>
+            <span className="text-emerald-200/90 italic">— {p.caption}</span>
           </div>
-          <div className="text-[10px] text-muted-foreground">{ago}</div>
-        </div>
-        <button
-          onClick={() => setDismissed(true)}
-          aria-label="Dismiss"
-          className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
+        ))}
       </div>
+      <style>{`
+        @keyframes led-scroll {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   );
 }
