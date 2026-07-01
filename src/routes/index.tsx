@@ -194,7 +194,7 @@ function ProductList() {
                 <div className="mt-1 text-sm"><span className="text-muted-foreground">Cycle(Days) </span><span className="font-bold">{p.cycle_days}</span></div>
               </div>
               <div className="h-16 w-20 overflow-hidden rounded-lg bg-muted">
-                {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />}
+                {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />}
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3 rounded-lg bg-muted px-4 py-3 text-center">
