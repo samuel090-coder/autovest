@@ -52,7 +52,7 @@ function Home() {
     queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "welfare").order("sort_order")).data ?? [],
   });
 
-  const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/wallet" | "/orders" | "/recharge" | "/free-cash" | "/bonus-task" | "/certification" | "/lucky-draw"; badge?: number }> = [
+  const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/message" | "/wallet" | "/orders" | "/recharge" | "/free-cash" | "/bonus-task" | "/certification" | "/lucky-draw"; badge?: number }> = [
     { label: "Message", icon: Headphones, to: "/message", badge: 0 },
     { label: "Free Cash", icon: Gift, to: "/free-cash" },
     { label: "Cash Benefits", icon: HandCoins, to: "/bonus-task" },
