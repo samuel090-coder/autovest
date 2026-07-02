@@ -83,6 +83,89 @@ export type Database = {
         }
         Relationships: []
       }
+      bonus_state: {
+        Row: {
+          next_available_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          next_available_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          next_available_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bonus_videos: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          is_active: boolean
+          poster_url: string | null
+          sort_order: number
+          title: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          is_active?: boolean
+          poster_url?: string | null
+          sort_order?: number
+          title?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          is_active?: boolean
+          poster_url?: string | null
+          sort_order?: number
+          title?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      bonus_watches: {
+        Row: {
+          id: string
+          reward_amount: number
+          user_id: string
+          video_id: string
+          watched_at: string
+        }
+        Insert: {
+          id?: string
+          reward_amount?: number
+          user_id: string
+          video_id: string
+          watched_at?: string
+        }
+        Update: {
+          id?: string
+          reward_amount?: number
+          user_id?: string
+          video_id?: string
+          watched_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_watches_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "bonus_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       free_cash_codes: {
         Row: {
           amount: number
@@ -587,6 +670,7 @@ export type Database = {
     }
     Functions: {
       claim_investment: { Args: { _uinv_id: string }; Returns: Json }
+      complete_bonus_watch: { Args: { _video_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
