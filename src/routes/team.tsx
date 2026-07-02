@@ -64,9 +64,9 @@ function Team() {
       <div className="px-4 pt-4">
         <div className="rounded-2xl bg-card p-4 text-center shadow-sm">
           <div className="text-sm">My invitation code</div>
-          <div className="mt-2 flex items-center justify-between rounded-lg bg-dark-surface px-3 py-2 text-left text-white">
-            <span className="truncate text-sm">{link || "—"}</span>
-            <button onClick={() => copy(link)}><Copy className="h-4 w-4" /></button>
+          <div className="mt-2 flex items-center gap-2 rounded-lg bg-dark-surface px-3 py-2 text-left text-white">
+            <span className="min-w-0 flex-1 truncate text-xs [overflow-wrap:anywhere]">{link || "—"}</span>
+            <button onClick={() => copy(link)} className="shrink-0"><Copy className="h-4 w-4" /></button>
           </div>
           <div className="mt-2 text-xs text-muted-foreground">Code: <span className="font-bold tracking-widest">{code || "—"}</span></div>
         </div>
