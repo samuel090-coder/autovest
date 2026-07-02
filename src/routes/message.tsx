@@ -86,9 +86,9 @@ function MessagePage() {
                 }`}>
                   {tab === "announcement" ? <Bell className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-bold">{m.title ?? "Notice"}</div>
-                  <div className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                <div className="min-w-0 flex-1">
+                  <div className="break-words text-sm font-bold [overflow-wrap:anywhere]">{m.title ?? "Notice"}</div>
+                  <div className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
                     {m.body}
                   </div>
                   {m.image_url && (
