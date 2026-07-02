@@ -64,9 +64,9 @@ function Team() {
       <div className="px-4 pt-4">
         <div className="rounded-2xl bg-card p-4 text-center shadow-sm">
           <div className="text-sm">My invitation code</div>
-          <div className="mt-2 flex items-center justify-between rounded-lg bg-dark-surface px-3 py-2 text-left text-white">
-            <span className="truncate text-sm">{link || "—"}</span>
-            <button onClick={() => copy(link)}><Copy className="h-4 w-4" /></button>
+          <div className="mt-2 flex items-center gap-2 rounded-lg bg-dark-surface px-3 py-2 text-left text-white">
+            <span className="min-w-0 flex-1 truncate text-xs [overflow-wrap:anywhere]">{link || "—"}</span>
+            <button onClick={() => copy(link)} className="shrink-0"><Copy className="h-4 w-4" /></button>
           </div>
           <div className="mt-2 text-xs text-muted-foreground">Code: <span className="font-bold tracking-widest">{code || "—"}</span></div>
         </div>
@@ -89,11 +89,11 @@ function Team() {
       <div className="space-y-3 px-4 pt-4">
         {tiers.map((t) => (
           <div key={t.tier} className="overflow-hidden rounded-2xl bg-dark-surface">
-            <div className="m-2 grid grid-cols-3 items-center rounded-lg bg-card px-3 py-3">
-              <div className="text-sm">Referrals:<div className="mt-1 inline-flex items-center gap-1 font-bold">👤 {t.refs}</div></div>
-              <div className="text-sm">Deposit cashback:<div className="mt-1 inline-flex items-center gap-1 font-bold">💰 {formatNaira(t.deposit * t.pct / 100)}</div></div>
-              <div className={`${t.color} -mr-3 -my-3 ml-2 grid h-14 place-items-center rounded-l-full pl-4 pr-3 text-white`}>
-                <div className="text-right">🏅 <span className="text-xs">Tier{t.tier}</span> <span className="text-base font-bold">{t.pct}%</span></div>
+            <div className="m-2 grid grid-cols-[1fr_1fr_auto] items-center gap-2 rounded-lg bg-card px-3 py-3">
+              <div className="min-w-0 text-xs">Referrals:<div className="mt-1 inline-flex items-center gap-1 text-sm font-bold">👤 {t.refs}</div></div>
+              <div className="min-w-0 text-xs">Cashback:<div className="mt-1 truncate text-sm font-bold">💰 {formatNaira(t.deposit * t.pct / 100)}</div></div>
+              <div className={`${t.color} -my-3 -mr-3 grid h-14 shrink-0 place-items-center rounded-l-full pl-4 pr-3 text-white`}>
+                <div className="text-right text-xs">🏅 Tier{t.tier} <span className="text-base font-bold">{t.pct}%</span></div>
               </div>
             </div>
           </div>
