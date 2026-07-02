@@ -287,39 +287,90 @@ function FreeCashAdmin() {
 }
 
 function CashBenefitsEditor() {
+  const qc = useQueryClient();
   const { data, save } = useSetting("cash_benefits");
-  const [video, setVideo] = useState("");
   const [headline, setHeadline] = useState("");
   const [body, setBody] = useState("");
   const [minWith, setMinWith] = useState("6000");
+  const [reward, setReward] = useState("27");
+  const [cooldown, setCooldown] = useState("3600");
+  useEffect(() => {
+    if (!data) return;
+    setHeadline(data.headline ?? "Bonus Task");
+    setBody(data.body ?? "");
+    setMinWith(String(data.min_withdrawal ?? 6000));
+    setReward(String(data.reward_amount ?? 27));
+    setCooldown(String(data.cooldown_seconds ?? 3600));
+  }, [data]);
+
+  const { data: videos = [] } = useQuery({
+    queryKey: ["admin-bonus-videos"],
+    queryFn: async () => (await supabase.from("bonus_videos").select("*").order("sort_order")).data ?? [],
+  });
+
+  const [title, setTitle] = useState("");
   const [uploading, setUploading] = useState(false);
-  useEffect(() => { if (!data) return; setVideo(data.video_url ?? ""); setHeadline(data.headline ?? "Bonus Task"); setBody(data.body ?? ""); setMinWith(String(data.min_withdrawal ?? 6000)); }, [data]);
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
+    const files = Array.from(e.target.files ?? []); if (!files.length) return;
     setUploading(true);
     try {
-      const url = await uploadAndGetUrl("banners", f, `cash-benefits/${Date.now()}_${f.name}`);
-      setVideo(url);
-      toast.success("Uploaded");
+      const nextOrder = (videos.at(-1) as any)?.sort_order ?? videos.length;
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        const url = await uploadAndGetUrl("banners", f, `bonus/${Date.now()}_${i}_${f.name}`);
+        await supabase.from("bonus_videos").insert({ url, title: title || f.name, sort_order: nextOrder + i + 1, is_active: true });
+      }
+      setTitle("");
+      toast.success(`Uploaded ${files.length} video(s)`);
+      qc.invalidateQueries({ queryKey: ["admin-bonus-videos"] });
     } catch (err: any) { toast.error(err.message); }
     setUploading(false);
+    e.target.value = "";
   }
 
   return (
-    <Card className="p-4 space-y-3">
-      <h3 className="font-semibold">Cash Benefits page (Bonus Task)</h3>
-      <div><Label className="text-xs">Headline</Label><Input value={headline} onChange={(e) => setHeadline(e.target.value)} /></div>
-      <div><Label className="text-xs">Min withdrawal (₦)</Label><Input value={minWith} onChange={(e) => setMinWith(e.target.value.replace(/[^0-9]/g, ""))} /></div>
-      <div><Label className="text-xs">Body text</Label><Textarea rows={5} value={body} onChange={(e) => setBody(e.target.value)} /></div>
-      <div>
-        <Label className="text-xs">Video URL</Label>
-        <Input value={video} onChange={(e) => setVideo(e.target.value)} placeholder="https://… or upload below" />
-        <Input type="file" accept="video/*" onChange={onUpload} className="mt-2" />
-        {uploading && <div className="text-xs">Uploading…</div>}
-      </div>
-      <Button onClick={() => save.mutate({ video_url: video, headline, body, min_withdrawal: Number(minWith) })} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
-    </Card>
+    <div className="space-y-4">
+      <Card className="p-4 space-y-3">
+        <h3 className="font-semibold">Cash Benefits — settings</h3>
+        <div className="grid grid-cols-2 gap-2">
+          <div><Label className="text-xs">Headline</Label><Input value={headline} onChange={(e) => setHeadline(e.target.value)} /></div>
+          <div><Label className="text-xs">Reward per video (₦)</Label><Input value={reward} onChange={(e) => setReward(e.target.value.replace(/[^0-9]/g, ""))} /></div>
+          <div><Label className="text-xs">Cooldown (seconds)</Label><Input value={cooldown} onChange={(e) => setCooldown(e.target.value.replace(/[^0-9]/g, ""))} /></div>
+          <div><Label className="text-xs">Min withdrawal (₦)</Label><Input value={minWith} onChange={(e) => setMinWith(e.target.value.replace(/[^0-9]/g, ""))} /></div>
+        </div>
+        <div><Label className="text-xs">Body text</Label><Textarea rows={4} value={body} onChange={(e) => setBody(e.target.value)} /></div>
+        <Button onClick={() => save.mutate({ headline, body, min_withdrawal: Number(minWith), reward_amount: Number(reward), cooldown_seconds: Number(cooldown) })} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save settings"}</Button>
+      </Card>
+
+      <Card className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">Video library ({videos.length})</h3>
+          <span className="text-xs text-muted-foreground">Upload up to hundreds of clips</span>
+        </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+          <Input placeholder="Optional title prefix" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input type="file" accept="video/*" multiple onChange={onUpload} className="md:col-span-2" />
+        </div>
+        {uploading && <div className="text-xs">Uploading… please wait</div>}
+
+        <div className="mt-2 max-h-96 space-y-1 overflow-y-auto text-sm">
+          {videos.map((v: any, idx: number) => (
+            <div key={v.id} className="flex items-center justify-between gap-2 rounded border p-2">
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-medium">{idx + 1}. {v.title ?? "Untitled"}</div>
+                <a href={v.url} target="_blank" rel="noreferrer" className="block truncate text-[11px] text-blue-600">{v.url}</a>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <Switch checked={!!v.is_active} onCheckedChange={async (val) => { await supabase.from("bonus_videos").update({ is_active: val }).eq("id", v.id); qc.invalidateQueries({ queryKey: ["admin-bonus-videos"] }); }} />
+                <Button size="icon" variant="ghost" onClick={async () => { if (!confirm("Delete this video?")) return; await supabase.from("bonus_videos").delete().eq("id", v.id); qc.invalidateQueries({ queryKey: ["admin-bonus-videos"] }); }}><Trash2 className="h-4 w-4 text-red-600" /></Button>
+              </div>
+            </div>
+          ))}
+          {videos.length === 0 && <div className="text-center text-xs text-muted-foreground">No videos yet</div>}
+        </div>
+      </Card>
+    </div>
   );
 }
 
