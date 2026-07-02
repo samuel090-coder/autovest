@@ -95,7 +95,7 @@ function Chat() {
       <div className="space-y-3 px-3 py-4">
         {msgs.map((m, i) => (
           <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-            <div className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
+            <div className={`max-w-[80%] overflow-hidden whitespace-pre-wrap break-words [overflow-wrap:anywhere] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
               m.role === "user"
                 ? "rounded-br-sm bg-brand text-white"
                 : "rounded-bl-sm bg-white ring-1 ring-border"
