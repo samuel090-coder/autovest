@@ -11,11 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { FlashSalePopup } from "@/components/flash-sale-popup";
-import { LotteryPopup } from "@/components/lottery-popup";
-import { LiveCreditAlerts } from "@/components/live-credit-alerts";
-import { CongratsPopup } from "@/components/congrats-popup";
-import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -82,25 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AutoVest — Dashboard" },
+      { title: "AutoVest — Earn 1million Naira" },
       { name: "description", content: "Track your balance, browse welfare products and grow your daily income." },
-      { name: "author", content: "InvestPro" },
-      { name: "theme-color", content: "#dc2626" },
-      { property: "og:title", content: "AutoVest — Dashboard" },
+      { name: "author", content: "Lovable" },
+      { property: "og:title", content: "AutoVest — Earn 1million Naira" },
       { property: "og:description", content: "Track your balance, browse welfare products and grow your daily income." },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "InvestPro" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "AutoVest — Dashboard" },
+      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "AutoVest — Earn 1million Naira" },
       { name: "twitter:description", content: "Track your balance, browse welfare products and grow your daily income." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ce93f17b-b16a-473d-8b2f-7d2f07fb734e/id-preview-17d9348f--f3614010-968d-4a48-8e02-7b152c419317.lovable.app-1783104897513.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ce93f17b-b16a-473d-8b2f-7d2f07fb734e/id-preview-17d9348f--f3614010-968d-4a48-8e02-7b152c419317.lovable.app-1783104897513.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OjxhPBBGcgbt5jzZBtU5uh9tOYv1/social-images/social-1783112590196-1002907305.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OjxhPBBGcgbt5jzZBtU5uh9tOYv1/social-images/social-1783112590196-1002907305.webp" },
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
-      { rel: "manifest", href: "/manifest.json" },
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -126,20 +120,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <LotteryPopup />
-      <LiveCreditAlerts />
-      <FlashSalePopup />
-      <CongratsPopup />
-      <Toaster />
     </QueryClientProvider>
   );
 }
