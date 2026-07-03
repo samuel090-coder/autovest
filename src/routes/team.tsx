@@ -47,9 +47,16 @@ function Team() {
   });
 
   function copy(text: string) { navigator.clipboard.writeText(text); toast.success("Copied"); }
+
+  const shareMessage = `Hey! 👋 I've been earning daily on InvestPro and it actually pays out. You invest, watch short videos and complete tasks to earn every single day — plus instant withdrawals to your bank.
+
+Sign up with my invitation link below and we both get a referral bonus 💰 once you make your first deposit.
+
+Join me here 👉 ${link}`;
+
   async function share() {
-    if (navigator.share) try { await navigator.share({ title: "Join InvestPro", text: "Use my code to join InvestPro", url: link }); } catch {}
-    else copy(link);
+    if (navigator.share) try { await navigator.share({ title: "Join InvestPro", text: shareMessage }); return; } catch {}
+    copy(shareMessage);
   }
 
   const tiers = [
