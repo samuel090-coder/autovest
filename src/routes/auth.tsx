@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,19 +34,6 @@ function AuthPage() {
   const [regEmail, setRegEmail] = useState("");
   const [regRef, setRegRef] = useState("");
 
-  const { data: banners = [] } = useQuery({
-    queryKey: ["login-banners"],
-    queryFn: async () =>
-      (await supabase
-        .from("banners")
-        .select("*")
-        .in("key", ["login_register", "login_app_download", "login_support"])
-        .eq("is_active", true)).data ?? [],
-  });
-  const byKey = (k: string) => banners.find((b: any) => b.key === k);
-  const registerBanner = byKey("login_register");
-  const appBanner = byKey("login_app_download");
-  const supportBanner = byKey("login_support");
 
   const { data: appDl } = useQuery({
     queryKey: ["app-download"],
@@ -161,16 +149,9 @@ async function handleLogin(e: React.FormEvent) {
 }
 
   return (
-    <div className="min-h-screen bg-red-600 px-4 py-4">
-      {/* Register banner (admin-uploaded image only) */}
-      {registerBanner?.image_url && (
-        <a href={registerBanner.link ?? "#"} className="block overflow-hidden rounded-xl bg-white/10">
-          <img src={registerBanner.image_url} alt={registerBanner.title ?? ""} className="h-32 w-full object-cover" />
-        </a>
-      )}
-
+    <div className="min-h-screen bg-red-600 px-4 py-6">
       {/* Login card */}
-      <div className="mt-4 rounded-2xl bg-white p-6 shadow-lg">
+      <div className="rounded-2xl bg-white p-6 shadow-lg">
         <h2 className="mb-5 text-center text-2xl font-extrabold tracking-wider">
           {tab === "login" ? "LOG IN" : "REGISTER"}
         </h2>
@@ -228,24 +209,12 @@ async function handleLogin(e: React.FormEvent) {
         )}
 
         {/* App download (PWA install) */}
-        {appBanner?.image_url ? (
-          <button type="button" onClick={handleInstall} className="mt-4 block w-full overflow-hidden rounded-2xl">
-            <img src={appBanner.image_url} alt={appBanner.title ?? "Download app"} className="w-full object-cover" />
+        <div className="mt-4 rounded-2xl bg-blue-50 p-4 text-center">
+          <p className="mb-2 text-sm text-gray-600">Install the app for the best experience</p>
+          <button type="button" onClick={handleInstall} className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
+            <Download className="h-4 w-4" /> APP Download
           </button>
-        ) : (
-          <div className="mt-4 rounded-2xl bg-blue-50 p-4 text-center">
-            <p className="mb-2 text-sm text-gray-600">Install the app for the best experience</p>
-            <button type="button" onClick={handleInstall} className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
-              <Download className="h-4 w-4" /> APP Download
-            </button>
-          </div>
-        )}
-
-        {supportBanner?.image_url && (
-          <a href={supportBanner.link ?? "#"} className="mt-4 block overflow-hidden rounded-2xl">
-            <img src={supportBanner.image_url} alt={supportBanner.title ?? "Support"} className="w-full object-cover" />
-          </a>
-        )}
+        </div>
       </div>
     </div>
   );

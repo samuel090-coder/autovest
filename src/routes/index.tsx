@@ -49,7 +49,7 @@ function Home() {
 
   const { data: welfareItems = [] } = useQuery({
     queryKey: ["welfare-items"],
-    queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "welfare").order("sort_order")).data ?? [],
+    queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "welfare").order("sort_order", { ascending: true }).order("created_at", { ascending: true })).data ?? [],
   });
 
   const actions: Array<{ label: string; icon: typeof Headphones; to: "/chat" | "/message" | "/wallet" | "/orders" | "/recharge" | "/free-cash" | "/bonus-task" | "/certification" | "/lucky-draw"; badge?: number }> = [
@@ -157,6 +157,9 @@ function Home() {
         </div>
       </div>
 
+      {/* Free investment (price = 0) */}
+      <FreeInvestments />
+
       {/* Product center */}
       <div className="px-4 pt-6 pb-2"><h2 className="text-lg font-bold">Product Center</h2></div>
       <ProductList />
@@ -177,10 +180,53 @@ function Stat({ value, sub, info }: { value: string; sub: string; info?: boolean
   );
 }
 
+function FreeInvestments() {
+  const { data: items = [] } = useQuery({
+    queryKey: ["free-investments"],
+    queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("price", 0).order("created_at", { ascending: true })).data ?? [],
+  });
+  if (items.length === 0) return null;
+  return (
+    <div className="px-4 pt-5">
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="text-lg font-bold">Free Investment</h2>
+        <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">FREE · CLAIM NOW</span>
+      </div>
+      <div className="space-y-3">
+        {items.map((p) => (
+          <Link key={p.id} to="/investment/$id" params={{ id: p.id }} className="block">
+            <div className="rounded-2xl bg-card p-3 shadow-sm ring-1 ring-success/40">
+              <div className="flex items-start gap-3">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
+                  {p.image_url && <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <div className="truncate text-base font-bold">{p.name}</div>
+                    <span className="rounded bg-success px-1.5 py-0.5 text-[10px] font-bold text-white">FREE</span>
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">Starting time: <span className="text-foreground">{new Date().toLocaleString()}</span></div>
+                  <div className="text-xs text-muted-foreground">Expiration time: <span className="text-warning font-semibold">{new Date(Date.now() + Number(p.cycle_days) * 86400_000).toLocaleString()}</span></div>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div><div className="font-bold">{p.cycle_days}</div><div className="text-[11px] text-muted-foreground">Cycle(Days)</div></div>
+                <div><div className="text-warning font-bold">{Number(p.daily_income).toLocaleString()}</div><div className="text-[11px] text-muted-foreground">Daily Income</div></div>
+                <div><div className="text-warning font-bold">{Number(p.total_income).toLocaleString()}</div><div className="text-[11px] text-muted-foreground">Total Income</div></div>
+              </div>
+              <Button className="mt-3 w-full bg-success text-white hover:bg-success/90">Claim Free Investment</Button>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ProductList() {
   const { data: items = [] } = useQuery({
     queryKey: ["products"],
-    queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "product").order("sort_order")).data ?? [],
+    queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("category", "product").gt("price", 0).order("sort_order", { ascending: true }).order("created_at", { ascending: true })).data ?? [],
   });
   if (items.length === 0) return <div className="px-4 pb-6 text-center text-sm text-muted-foreground">No products yet. Admins can add them from the admin panel.</div>;
   return (
