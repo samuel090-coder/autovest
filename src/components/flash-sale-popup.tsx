@@ -91,9 +91,9 @@ export function FlashSalePopup() {
 
 function Stat({ v, l }: { v: string; l: string }) {
   return (
-    <div>
-      <div className="text-warning text-base font-bold">{v}</div>
-      <div className="text-[10px] opacity-80">{l}</div>
+    <div className="min-w-0">
+      <div className="text-warning truncate text-sm font-bold">{v}</div>
+      <div className="text-[9px] opacity-80">{l}</div>
     </div>
   );
 }
