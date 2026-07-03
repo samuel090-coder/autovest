@@ -33,19 +33,6 @@ function AuthPage() {
   const [regEmail, setRegEmail] = useState("");
   const [regRef, setRegRef] = useState("");
 
-  const { data: banners = [] } = useQuery({
-    queryKey: ["login-banners"],
-    queryFn: async () =>
-      (await supabase
-        .from("banners")
-        .select("*")
-        .in("key", ["login_register", "login_app_download", "login_support"])
-        .eq("is_active", true)).data ?? [],
-  });
-  const byKey = (k: string) => banners.find((b: any) => b.key === k);
-  const registerBanner = byKey("login_register");
-  const appBanner = byKey("login_app_download");
-  const supportBanner = byKey("login_support");
 
   const { data: appDl } = useQuery({
     queryKey: ["app-download"],
