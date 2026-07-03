@@ -17,6 +17,7 @@ export const Route = createFileRoute("/team")({
 
 function Team() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [code, setCode] = useState("");
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
