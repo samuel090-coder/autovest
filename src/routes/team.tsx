@@ -1,12 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, BottomNav } from "@/components/app-shell";
 import { SupportBadge } from "@/components/support-badge";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Copy, User, CheckCircle2, Share2 } from "lucide-react";
+import { Copy, User, CheckCircle2, Share2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { formatNaira } from "@/lib/format";
 
 export const Route = createFileRoute("/team")({
