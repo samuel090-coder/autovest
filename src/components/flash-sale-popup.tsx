@@ -48,40 +48,39 @@ export function FlashSalePopup() {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && close()}>
-      <DialogContent className="max-w-sm overflow-hidden bg-[#fff8ee] p-0">
-        <div className="-mt-2 mx-auto w-[90%] rounded-2xl bg-gradient-to-r from-[#ff7a5c] to-[#ffa07a] p-4 text-white">
-          <div className="text-2xl font-extrabold italic tracking-wide drop-shadow">FLASH SALE</div>
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-[340px] overflow-hidden rounded-2xl bg-[#fff8ee] p-0">
+        <div className="-mt-1 mx-auto w-[88%] rounded-xl bg-gradient-to-r from-[#ff7a5c] to-[#ffa07a] px-3 py-2 text-center text-white">
+          <div className="text-lg font-extrabold italic tracking-wide drop-shadow">FLASH SALE</div>
         </div>
-        <div className="p-4 pt-2">
-          <div className="relative overflow-hidden rounded-xl bg-muted">
-            {sale.image_url && <img src={sale.image_url} alt={sale.name} className="aspect-[16/10] w-full object-cover" />}
+        <div className="p-3 pt-2">
+          <div className="relative overflow-hidden rounded-lg bg-muted">
+            {sale.image_url && <img src={sale.image_url} alt={sale.name} className="aspect-[16/9] w-full object-cover" />}
             {pct > 0 && (
-              <span className="absolute right-0 top-3 rounded-l-md bg-brand px-3 py-1 text-sm font-bold text-white">{pct}%</span>
+              <span className="absolute right-0 top-2 rounded-l-md bg-brand px-2 py-0.5 text-xs font-bold text-white">{pct}%</span>
             )}
           </div>
-          <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl bg-dark-surface p-3 text-center text-white">
+          <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-lg bg-dark-surface p-2 text-center text-white">
             <Stat v={String(sale.cycle_days)} l="Cycle(Days)" />
-            <Stat v={Number(sale.daily_income).toLocaleString()} l="Daily Income(₦)" />
-            <Stat v={Number(sale.total_income).toLocaleString()} l="Total Income(₦)" />
+            <Stat v={Number(sale.daily_income).toLocaleString()} l="Daily(₦)" />
+            <Stat v={Number(sale.total_income).toLocaleString()} l="Total(₦)" />
           </div>
-          <div className="mt-3 flex items-baseline justify-between px-1">
-            <span className="text-muted-foreground">Price(₦)</span>
-            <div>
-              {salePrice < original && <span className="mr-2 text-muted-foreground line-through">{original.toLocaleString()}</span>}
-              <span className="text-info text-2xl font-extrabold">{salePrice.toLocaleString()}</span>
+          <div className="mt-2 flex items-baseline justify-between px-1">
+            <span className="text-xs text-muted-foreground">Price(₦)</span>
+            <div className="min-w-0">
+              {salePrice < original && <span className="mr-1.5 text-xs text-muted-foreground line-through">{original.toLocaleString()}</span>}
+              <span className="text-info text-lg font-extrabold">{salePrice.toLocaleString()}</span>
             </div>
           </div>
-          <Link to="/investment/$id" params={{ id: sale.id }} onClick={close} className="mt-3 block">
-            <Button className="bg-flash-gradient h-12 w-full rounded-full text-base font-semibold text-white shadow-md">Invest now</Button>
+          <Link to="/investment/$id" params={{ id: sale.id }} onClick={close} className="mt-2 block">
+            <Button className="bg-flash-gradient h-10 w-full rounded-full text-sm font-semibold text-white shadow-md">Invest now</Button>
           </Link>
           {sale.description && (
-            <div className="mt-3 max-h-40 overflow-y-auto text-sm leading-relaxed">
-              {sale.description.split("\n").map((line, i) => (
-                <p key={i} className="py-1">💰 {line}</p>
+            <div className="mt-2 max-h-24 overflow-y-auto text-xs leading-relaxed [overflow-wrap:anywhere]">
+              {sale.description.split("\n").slice(0, 3).map((line, i) => (
+                <p key={i} className="py-0.5">💰 {line}</p>
               ))}
-              <p className="py-1">📅 Duration: {sale.cycle_days}</p>
-              <p className="py-1">📈 Daily Earnings: {formatNaira(sale.daily_income)}</p>
-              <p className="py-1">🏆 Total Earnings: {formatNaira(sale.total_income)}</p>
+              <p className="py-0.5">📅 Duration: {sale.cycle_days} days</p>
+              <p className="py-0.5">📈 Daily: {formatNaira(sale.daily_income)}</p>
             </div>
           )}
         </div>
