@@ -56,9 +56,22 @@ Sign up with my invitation link below and we both get a referral bonus 💰 once
 
 Join me here 👉 ${link}`;
 
-  async function share() {
-    if (navigator.share) try { await navigator.share({ title: "Join InvestPro", text: shareMessage }); return; } catch {}
-    copy(shareMessage);
+  function openShare() {
+    setShareOpen(true);
+  }
+
+  function shareTo(target: "whatsapp" | "facebook" | "telegram" | "instagram") {
+    const text = encodeURIComponent(shareMessage);
+    const url = encodeURIComponent(link);
+    if (target === "whatsapp") window.open(`https://wa.me/?text=${text}`, "_blank");
+    else if (target === "facebook") window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, "_blank");
+    else if (target === "telegram") window.open(`https://t.me/share/url?url=${url}&text=${text}`, "_blank");
+    else if (target === "instagram") {
+      navigator.clipboard.writeText(shareMessage);
+      toast.success("Message copied — paste it into Instagram");
+      window.open("https://www.instagram.com/", "_blank");
+    }
+    setShareOpen(false);
   }
 
   const tiers = [
