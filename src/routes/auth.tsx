@@ -43,6 +43,16 @@ function AuthPage() {
     },
   });
 
+  const { data: banners = [] } = useQuery({
+    queryKey: ["auth-banners"],
+    queryFn: async () =>
+      (await supabase.from("banners").select("key,title,subtitle,image_url,link").eq("is_active", true)
+        .in("key", ["login_register", "login_app_download", "login_support"])).data ?? [],
+  });
+  const registerBanner = banners.find((b) => b.key === "login_register");
+  const appBanner = banners.find((b) => b.key === "login_app_download");
+  const supportBanner = banners.find((b) => b.key === "login_support");
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const p = new URLSearchParams(window.location.search);
