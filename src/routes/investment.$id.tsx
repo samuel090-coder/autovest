@@ -37,11 +37,28 @@ function InvestmentDetails() {
     queryFn: async () => (await supabase.from("wallets").select("*").eq("user_id", userId!).maybeSingle()).data,
   });
 
+  const isFree = Number(inv?.price ?? 0) === 0;
+
+  const { data: alreadyClaimed } = useQuery({
+    queryKey: ["free-claim-check", userId, id],
+    enabled: !!userId && !!inv && isFree,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_investments")
+        .select("id")
+        .eq("user_id", userId!)
+        .eq("investment_id", id)
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
   const invest = useMutation({
     mutationFn: async () => {
       if (!inv || !userId || !wallet) throw new Error("Not ready");
       const price = Number(inv.price);
-      if (Number(wallet.balance) < price) throw new Error("Insufficient balance — please recharge");
+      if (isFree && alreadyClaimed) throw new Error("You have already claimed this free investment");
+      if (!isFree && Number(wallet.balance) < price) throw new Error("Insufficient balance — please recharge");
       const { error: txErr } = await supabase.from("transactions").insert({
         user_id: userId, type: "invest", amount: price, status: "approved",
         meta: { investment_id: inv.id, name: inv.name },
@@ -52,18 +69,24 @@ function InvestmentDetails() {
         price_paid: price, daily_income: inv.daily_income,
         total_income: inv.total_income, cycle_days: inv.cycle_days,
       });
-      if (uiErr) throw uiErr;
-      const { error: wErr } = await supabase.from("wallets")
-        .update({ balance: Number(wallet.balance) - price })
-        .eq("user_id", userId);
-      if (wErr) throw wErr;
+      if (uiErr) {
+        if ((uiErr as { code?: string }).code === "23505") throw new Error("You have already claimed this free investment");
+        throw uiErr;
+      }
+      if (price > 0) {
+        const { error: wErr } = await supabase.from("wallets")
+          .update({ balance: Number(wallet.balance) - price })
+          .eq("user_id", userId);
+        if (wErr) throw wErr;
+      }
     },
     onSuccess: () => {
-      toast.success("Investment successful");
+      toast.success(isFree ? "Free investment claimed!" : "Investment successful");
       qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["free-investments"] });
       setOpen(false);
       import("@/components/congrats-popup").then(({ fireCongrats }) =>
-        fireCongrats({ title: "Investment Activated!", subtitle: `${inv?.name ?? "Your plan"} is now earning`, amount: inv?.daily_income })
+        fireCongrats({ title: isFree ? "Free Investment Claimed!" : "Investment Activated!", subtitle: `${inv?.name ?? "Your plan"} is now earning`, amount: inv?.daily_income })
       );
       navigate({ to: "/orders" });
     },
@@ -121,33 +144,84 @@ function InvestmentDetails() {
       )}
 
       <div className="fixed inset-x-0 bottom-0 mx-auto max-w-md p-4">
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button className="h-14 w-full rounded-full text-base font-semibold">Invest now</Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-2xl">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-3 text-left">
-                <div className="h-12 w-12 overflow-hidden rounded-lg bg-muted">
-                  {inv.image_url && <img src={inv.image_url} alt="" className="h-full w-full object-cover" />}
+        {isFree && alreadyClaimed ? (
+          <Button disabled className="h-14 w-full rounded-full text-base font-semibold">Already claimed</Button>
+        ) : (
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button className={`h-14 w-full rounded-full text-base font-semibold ${isFree ? "bg-success hover:bg-success/90" : ""}`}>
+                {isFree ? "Claim Free Investment" : "Invest now"}
+              </Button>
+            </SheetTrigger>
+            {isFree ? (
+              <SheetContent side="bottom" className="rounded-t-2xl border-0 bg-transparent p-0 shadow-none">
+                <SheetHeader className="sr-only"><SheetTitle>Receive a Gift</SheetTitle></SheetHeader>
+                <div className="mx-auto w-full max-w-md overflow-hidden rounded-t-3xl bg-gradient-to-b from-amber-300 to-amber-100 p-5 pb-6">
+                  <div className="flex items-start justify-between">
+                    <div className="text-white drop-shadow">
+                      <div className="text-3xl font-extrabold italic leading-tight">RECEIVE A</div>
+                      <div className="text-3xl font-extrabold italic leading-tight">GIFT</div>
+                    </div>
+                    <div className="text-5xl">🎁</div>
+                  </div>
+                  <div className="mt-4 rounded-2xl bg-white p-4 shadow">
+                    <div className="flex items-start gap-3">
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+                        {inv.image_url && <img src={inv.image_url} alt="" className="h-full w-full object-cover" />}
+                        <span className="absolute left-0 top-0 rounded-br-lg bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white">FREE</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-lg font-bold">{inv.name}</div>
+                        <div className="mt-1 text-sm">
+                          <span className="text-muted-foreground">Daily Income(₦): </span>
+                          <span className="text-brand font-bold">{Number(inv.daily_income).toLocaleString()}</span>
+                        </div>
+                        <div className="text-sm">
+                          <span className="text-muted-foreground">Total Income(₦): </span>
+                          <span className="text-brand font-bold">{Number(inv.total_income).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 rounded-xl bg-amber-50 py-3 text-center text-base">
+                      <span className="text-muted-foreground">Price(₦) </span>
+                      <span className="text-brand text-xl font-bold">{Number(inv.price).toLocaleString()}</span>
+                    </div>
+                    <Button
+                      onClick={() => invest.mutate()}
+                      disabled={invest.isPending}
+                      className="mt-4 h-12 w-full rounded-xl bg-blue-600 text-base font-bold text-white hover:bg-blue-700"
+                    >
+                      {invest.isPending ? "Processing…" : "Get it now"}
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-base">{inv.name}</div>
-                  <div className="text-sm font-normal"><span className="text-muted-foreground">Price(₦): </span><span className="text-brand text-lg font-bold">{Number(inv.price).toLocaleString()}</span></div>
+              </SheetContent>
+            ) : (
+              <SheetContent side="bottom" className="rounded-t-2xl">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-3 text-left">
+                    <div className="h-12 w-12 overflow-hidden rounded-lg bg-muted">
+                      {inv.image_url && <img src={inv.image_url} alt="" className="h-full w-full object-cover" />}
+                    </div>
+                    <div>
+                      <div className="text-base">{inv.name}</div>
+                      <div className="text-sm font-normal"><span className="text-muted-foreground">Price(₦): </span><span className="text-brand text-lg font-bold">{Number(inv.price).toLocaleString()}</span></div>
+                    </div>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="my-4 rounded-xl bg-muted p-4 text-sm space-y-2">
+                  <Line label="Investment Cycle(Days):" value={String(inv.cycle_days)} />
+                  <Line label="Daily Income:" value={formatNaira(inv.daily_income)} />
+                  <Line label="Total Income:" value={formatNaira(inv.total_income)} />
+                  <Line label="Need to pay:" value={formatNaira(inv.price)} valueClass="text-brand" />
                 </div>
-              </SheetTitle>
-            </SheetHeader>
-            <div className="my-4 rounded-xl bg-muted p-4 text-sm space-y-2">
-              <Line label="Investment Cycle(Days):" value={String(inv.cycle_days)} />
-              <Line label="Daily Income:" value={formatNaira(inv.daily_income)} />
-              <Line label="Total Income:" value={formatNaira(inv.total_income)} />
-              <Line label="Need to pay:" value={formatNaira(inv.price)} valueClass="text-brand" />
-            </div>
-            <Button onClick={() => invest.mutate()} disabled={invest.isPending} className="h-14 w-full rounded-full text-base">
-              {invest.isPending ? "Processing…" : "Invest now"}
-            </Button>
-          </SheetContent>
-        </Sheet>
+                <Button onClick={() => invest.mutate()} disabled={invest.isPending} className="h-14 w-full rounded-full text-base">
+                  {invest.isPending ? "Processing…" : "Invest now"}
+                </Button>
+              </SheetContent>
+            )}
+          </Sheet>
+        )}
       </div>
     </div>
   );
