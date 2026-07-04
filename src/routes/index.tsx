@@ -181,9 +181,21 @@ function Stat({ value, sub, info }: { value: string; sub: string; info?: boolean
 }
 
 function FreeInvestments() {
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id ?? null));
+  }, []);
   const { data: items = [] } = useQuery({
-    queryKey: ["free-investments"],
-    queryFn: async () => (await supabase.from("investments").select("*").eq("is_active", true).eq("price", 0).order("created_at", { ascending: true })).data ?? [],
+    queryKey: ["free-investments", uid],
+    enabled: !!uid,
+    queryFn: async () => {
+      const [{ data: free }, { data: mine }] = await Promise.all([
+        supabase.from("investments").select("*").eq("is_active", true).eq("price", 0).order("created_at", { ascending: true }),
+        supabase.from("user_investments").select("investment_id").eq("user_id", uid!),
+      ]);
+      const claimed = new Set((mine ?? []).map((r) => r.investment_id));
+      return (free ?? []).filter((p) => !claimed.has(p.id));
+    },
   });
   if (items.length === 0) return null;
   return (
