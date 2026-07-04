@@ -159,7 +159,22 @@ async function handleLogin(e: React.FormEvent) {
 }
 
   return (
-    <div className="min-h-screen bg-red-600 px-4 py-6">
+    <div className="min-h-screen bg-red-600 px-4 py-6 space-y-4">
+      {/* Top register banner (admin-uploadable: login_register) */}
+      {registerBanner?.image_url ? (
+        <a
+          href={registerBanner.link || "#"}
+          onClick={(e) => { if (!registerBanner.link) { e.preventDefault(); setTab("register"); } }}
+          className="block overflow-hidden rounded-2xl shadow-lg"
+        >
+          <img
+            src={registerBanner.image_url}
+            alt={registerBanner.title ?? "Register now"}
+            className="h-auto w-full object-cover"
+          />
+        </a>
+      ) : null}
+
       {/* Login card */}
       <div className="rounded-2xl bg-white p-6 shadow-lg">
         <h2 className="mb-5 text-center text-2xl font-extrabold tracking-wider">
@@ -217,16 +232,70 @@ async function handleLogin(e: React.FormEvent) {
             </Button>
           </form>
         )}
+      </div>
 
-        {/* App download (PWA install) */}
-        <div className="mt-4 rounded-2xl bg-blue-50 p-4 text-center">
-          <p className="mb-2 text-sm text-gray-600">Install the app for the best experience</p>
-          <button type="button" onClick={handleInstall} className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
+      {/* App download card — background image is admin-uploadable via banner key `login_app_download` */}
+      <div
+        className="relative overflow-hidden rounded-2xl p-5 shadow-lg"
+        style={
+          appBanner?.image_url
+            ? { backgroundImage: `url(${appBanner.image_url})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : { background: "linear-gradient(135deg,#1e40af,#2563eb)" }
+        }
+      >
+        <div className="absolute inset-0 bg-black/25" />
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="max-w-[60%] text-white">
+            <p className="text-base font-semibold leading-snug drop-shadow">
+              {appBanner?.title ?? "Download App and contact customer service for free cash!"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleInstall}
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-b from-amber-200 to-amber-400 px-5 py-2 text-sm font-bold text-amber-900 shadow-md active:scale-95"
+          >
             <Download className="h-4 w-4" /> APP Download
           </button>
         </div>
       </div>
+
+      {/* Support card — background image is admin-uploadable via banner key `login_support` */}
+      <div
+        className="relative overflow-hidden rounded-2xl p-5 shadow-lg"
+        style={
+          supportBanner?.image_url
+            ? { backgroundImage: `url(${supportBanner.image_url})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : { background: "linear-gradient(135deg,#facc15,#f59e0b)" }
+        }
+      >
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="relative space-y-3">
+          <div className="inline-block rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow">
+            {supportBanner?.title ?? "Contact for support and free cash"}
+          </div>
+          <div className="space-y-2">
+            <SocialLink href="https://t.me/autovast" bg="bg-sky-500">Telegram Channel</SocialLink>
+            <SocialLink href="https://wa.me/2348000000000" bg="bg-emerald-500">WhatsApp Service</SocialLink>
+            <SocialLink href="https://www.facebook.com/" bg="bg-blue-600">Facebook Community</SocialLink>
+            <SocialLink href="https://www.instagram.com/" bg="bg-pink-500">Instagram</SocialLink>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function SocialLink({ href, bg, children }: { href: string; bg: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center justify-center gap-2 rounded-full ${bg} px-4 py-2.5 text-sm font-semibold text-white shadow active:scale-[.98]`}
+    >
+      {children}
+    </a>
   );
 }
 
