@@ -243,3 +243,145 @@ function RechargePage() {
     </div>
   );
 }
+
+function ComplaintSection({ userId }: { userId: string | null }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [amt, setAmt] = useState("");
+  const [desc, setDesc] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const { data: mine = [] } = useQuery({
+    queryKey: ["my-complaints", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("payment_complaints")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data ?? [];
+    },
+  });
+
+  async function submit() {
+    if (!userId) return;
+    const amount = Number(amt);
+    if (!amount || amount < 100) return toast.error("Enter the amount you paid (₦100+)");
+    if (!desc.trim() || desc.trim().length < 10) return toast.error("Please describe the issue (min 10 chars)");
+    setBusy(true);
+    try {
+      let screenshot_url: string | null = null;
+      if (file) {
+        const ext = file.name.split(".").pop() ?? "jpg";
+        screenshot_url = await uploadAndGetUrl(
+          "complaint-proofs",
+          file,
+          `${userId}/${crypto.randomUUID()}.${ext}`,
+        );
+      }
+      const { error } = await (supabase as any).from("payment_complaints").insert({
+        user_id: userId,
+        amount,
+        description: desc.trim(),
+        screenshot_url,
+      });
+      if (error) throw error;
+      toast.success("Complaint submitted — support will review shortly");
+      setOpen(false);
+      setAmt(""); setDesc(""); setFile(null);
+      qc.invalidateQueries({ queryKey: ["my-complaints"] });
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not submit");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="px-4 pt-5">
+      <div className="rounded-2xl border bg-white p-4 shadow-sm">
+        <div className="flex items-center gap-2 text-base font-bold">
+          <LifeBuoy className="h-5 w-5 text-emerald-600" />
+          Payment not credited?
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          If you made a payment but your wallet was not credited, send us the details and a screenshot. Our team will verify and credit you manually.
+        </p>
+        <Button
+          onClick={() => setOpen(true)}
+          disabled={!userId}
+          className="mt-3 h-11 w-full rounded-full bg-emerald-600 text-sm font-semibold text-white hover:bg-emerald-700"
+        >
+          <LifeBuoy className="mr-2 h-4 w-4" /> Contact Support About a Payment
+        </Button>
+
+        {mine.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Your recent complaints</div>
+            {mine.map((c: any) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-sm">
+                <div>
+                  <div className="font-medium">{formatNaira(c.amount)}</div>
+                  <div className="text-xs text-muted-foreground">{new Date(c.created_at).toLocaleString()}</div>
+                </div>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                  c.status === "resolved" ? "bg-emerald-100 text-emerald-700"
+                  : c.status === "rejected" ? "bg-red-100 text-red-700"
+                  : "bg-amber-100 text-amber-700"
+                }`}>{c.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Report Payment Issue</DialogTitle>
+            <DialogDescription>Provide details so admin can verify and credit your wallet.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Amount paid (₦)</Label>
+              <Input
+                inputMode="numeric"
+                value={amt}
+                onChange={(e) => setAmt(e.target.value.replace(/[^0-9]/g, ""))}
+                placeholder="e.g. 66000"
+              />
+            </div>
+            <div>
+              <Label>Describe the issue</Label>
+              <Textarea
+                rows={4}
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                placeholder="When did you pay? Which method? Any transaction reference?"
+              />
+            </div>
+            <div>
+              <Label>Payment screenshot (optional but recommended)</Label>
+              <label className="mt-1 flex cursor-pointer items-center gap-2 rounded-md border border-dashed p-3 text-sm hover:bg-muted/50">
+                <Upload className="h-4 w-4" />
+                <span className="truncate">{file ? file.name : "Choose image…"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+            </div>
+            <Button onClick={submit} disabled={busy} className="w-full bg-emerald-600 hover:bg-emerald-700">
+              {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting…</> : "Submit Complaint"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
