@@ -2,11 +2,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Info, Phone } from "lucide-react";
+import { ArrowLeft, Info, Phone, LifeBuoy, Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { SupportBadge } from "@/components/support-badge";
+import { uploadAndGetUrl } from "@/lib/storage";
+import { formatNaira } from "@/lib/format";
 
 export const Route = createFileRoute("/recharge")({
   head: () => ({ meta: [{ title: "Recharge — InvestPro" }] }),
