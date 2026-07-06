@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
  * (10 years). Used because workspace blocks public buckets.
  */
 export async function uploadAndGetUrl(
-  bucket: "investment-images" | "banners" | "avatars",
+  bucket: "investment-images" | "banners" | "avatars" | "complaint-proofs",
   file: File,
   path?: string,
 ): Promise<string> {
