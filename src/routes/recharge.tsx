@@ -222,6 +222,10 @@ function RechargePage() {
         </div>
       )}
 
+      {/* Payment complaint / support */}
+      <ComplaintSection userId={userId} />
+
+
       {/* Sticky CTA — Paystack only */}
       <div className="fixed inset-x-0 bottom-0 z-30 space-y-2 border-t bg-white px-4 py-3 shadow-lg">
         <Button
