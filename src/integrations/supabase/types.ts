@@ -369,6 +369,42 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_complaints: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          screenshot_url: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          created_at?: string
+          description: string
+          id?: string
+          screenshot_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          screenshot_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_messages: {
         Row: {
           body: string
