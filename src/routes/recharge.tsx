@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Info, Phone, LifeBuoy, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Info, Mail, LifeBuoy, Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,7 +45,7 @@ function RechargePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [userId, setUserId] = useState<string | null>(null);
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("")
   const [amount, setAmount] = useState<string>("66000");
 
   useEffect(() => {
@@ -53,12 +53,11 @@ function RechargePage() {
       if (!data.session) return navigate({ to: "/auth" });
       setUserId(data.session.user.id);
       supabase
-        .from("profiles")
-        .select("phone")
-        .eq("id", data.session.user.id)
-        .maybeSingle()
-        .then(({ data: p }) => setPhone(p?.phone ?? ""));
-    });
+  .from("profiles")
+  .select("email")
+  .eq("id", data.session.user.id)
+  .maybeSingle()
+  .then(({ data: p }) => setEmail(p?.email ?? ""));
   }, [navigate]);
 
   const { data: wallet } = useQuery({
