@@ -107,7 +107,8 @@ function RechargePage() {
     if (!paystackCfg?.enabled) {
       return toast.error("Payments are temporarily disabled. Please contact support.");
     }
-    const keyIssue = getPaystackKeyIssue(paystackCfg.public_key, paystackCfg.mode);
+    const publicKey = paystackCfg.public_key?.trim() ?? "";
+    const keyIssue = getPaystackKeyIssue(publicKey, paystackCfg.mode);
     if (keyIssue) {
       return toast.error(keyIssue);
     }
@@ -126,7 +127,7 @@ function RechargePage() {
     if (!w.PaystackPop) return toast.error("Paystack script not loaded yet — try again");
     const popup = new w.PaystackPop();
     popup.newTransaction({
-      key: paystackCfg.public_key.trim(),
+      key: publicKey,
       email,
       amount: amt * 100,
       currency: "NGN",
