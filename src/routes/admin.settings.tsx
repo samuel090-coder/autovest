@@ -150,6 +150,21 @@ function PaystackEditor() {
   const [mode, setMode] = useState<"live" | "test">("live");
   useEffect(() => { if (!data) return; setEnabled(!!data.enabled); setPublicKey(data.public_key ?? ""); setMode((data.mode ?? "live") as any); }, [data]);
   const webhookUrl = typeof window !== "undefined" ? `${window.location.origin}/api/public/hooks/paystack` : "/api/public/hooks/paystack";
+  function validatePublicKey() {
+    const key = publicKey.trim();
+    if (!enabled && !key) return null;
+    if (!/^pk_(live|test)_[A-Za-z0-9]+$/.test(key)) return "Paste the Paystack PUBLIC key only. It must start with pk_live_ or pk_test_.";
+    const keyMode = key.startsWith("pk_live_") ? "live" : "test";
+    if (keyMode !== mode) return `Mode is ${mode}, but this public key is for ${keyMode}.`;
+    const keyBody = key.replace(/^pk_(live|test)_/, "");
+    if (keyBody.length < 32 || keyBody.length > 64) return "This Paystack public key length looks invalid. Copy it again from Paystack.";
+    return null;
+  }
+  function savePaystack() {
+    const issue = validatePublicKey();
+    if (issue) return toast.error(issue);
+    save.mutate({ enabled, public_key: publicKey.trim(), mode });
+  }
   return (
     <Card className="p-4 space-y-3">
       <h3 className="font-semibold">Paystack payment integration</h3>
@@ -164,7 +179,7 @@ function PaystackEditor() {
           <option value="live">Live</option><option value="test">Test</option>
         </select>
       </div>
-      <Button onClick={() => save.mutate({ enabled, public_key: publicKey, mode })} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
+      <Button onClick={savePaystack} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
 
       <div className="mt-4 rounded-lg border bg-muted/40 p-3">
         <div className="text-xs font-semibold">Webhook URL (paste this into Paystack → Settings → API Keys & Webhooks)</div>
