@@ -153,14 +153,13 @@ function RechargePage() {
         <Link to="/orders" className="text-sm text-foreground/80">Record</Link>
       </div>
 
-      {/* Phone + balance card */}
+      {/* email + balance card */}
       <div className="px-4 pt-3">
         <div className="rounded-2xl bg-[#fce0a0] p-4 shadow-sm">
-          <div className="text-sm font-medium">Phone number</div>
+          <div className="text-sm font-medium">Email address</div>
           <div className="mt-2 flex items-center gap-3 rounded-xl bg-white px-3 py-3 shadow-inner">
-            <span className="text-[#a14a1a] font-semibold">+234</span>
-            <span className="text-xl font-bold text-[#7a2e0e] tracking-wide flex-1">{phone || "—"}</span>
-            <Phone className="h-5 w-5 text-[#a14a1a]" />
+            <span className="text-xl font-bold text-[#7a2e0e] tracking-wide flex-1">{email || "—"}</span>
+            <Mail className="h-5 w-5 text-[#a14a1a]" />
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div className="text-sm">
