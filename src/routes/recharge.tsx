@@ -24,6 +24,23 @@ type RechargeSettings = {
   instructions?: string;
 };
 
+function getPaystackKeyIssue(publicKey?: string, mode?: string) {
+  const key = (publicKey ?? "").trim();
+  if (!key) return "Paystack public key is missing.";
+  if (!/^pk_(live|test)_[A-Za-z0-9]+$/.test(key)) {
+    return "Paystack public key must start with pk_live_ or pk_test_.";
+  }
+  const keyMode = key.startsWith("pk_live_") ? "live" : "test";
+  if ((mode === "live" || mode === "test") && keyMode !== mode) {
+    return `Paystack is set to ${mode} mode, but the public key is for ${keyMode} mode.`;
+  }
+  const keyBody = key.replace(/^pk_(live|test)_/, "");
+  if (keyBody.length < 32 || keyBody.length > 64) {
+    return "Paystack public key length looks invalid. Copy the full public key again from Paystack.";
+  }
+  return null;
+}
+
 function RechargePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -69,6 +86,8 @@ function RechargePage() {
   const presets = settings?.presets ?? [];
   const bonusMap = settings?.bonus_map ?? {};
   const instructions = settings?.instructions ?? "";
+  const paystackKeyIssue = getPaystackKeyIssue(paystackCfg?.public_key, paystackCfg?.mode);
+  const canPay = !!paystackCfg?.enabled && !paystackKeyIssue;
 
   // Inject Paystack inline script once
   useEffect(() => {
@@ -85,8 +104,13 @@ function RechargePage() {
 
   async function payWithPaystack() {
     if (!userId) return navigate({ to: "/auth" });
-    if (!paystackCfg?.public_key || !paystackCfg.public_key.startsWith("pk_")) {
-      return toast.error("Payments not configured yet. Please contact support.");
+    if (!paystackCfg?.enabled) {
+      return toast.error("Payments are temporarily disabled. Please contact support.");
+    }
+    const publicKey = paystackCfg.public_key?.trim() ?? "";
+    const keyIssue = getPaystackKeyIssue(publicKey, paystackCfg.mode);
+    if (keyIssue) {
+      return toast.error(keyIssue);
     }
     const amt = Number(amount);
     if (!amt || amt < 100) return toast.error("Enter at least ₦100");
@@ -103,7 +127,7 @@ function RechargePage() {
     if (!w.PaystackPop) return toast.error("Paystack script not loaded yet — try again");
     const popup = new w.PaystackPop();
     popup.newTransaction({
-      key: paystackCfg.public_key,
+      key: publicKey,
       email,
       amount: amt * 100,
       currency: "NGN",
@@ -206,9 +230,9 @@ function RechargePage() {
           <p className="mt-2 text-sm text-muted-foreground">
             We accept payments via Paystack. You can pay using your <b>bank card (Visa / Mastercard / Verve)</b> <i>or</i> via <b>bank transfer</b> — Paystack will show you both options on the payment page. Funds reflect instantly after confirmation.
           </p>
-          {!paystackCfg?.enabled || !paystackCfg?.public_key ? (
+          {!canPay ? (
             <div className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
-              Payments are temporarily disabled. Please contact support.
+              {paystackCfg?.enabled ? paystackKeyIssue : "Payments are temporarily disabled. Please contact support."}
             </div>
           ) : null}
         </div>
@@ -230,10 +254,10 @@ function RechargePage() {
       <div className="fixed inset-x-0 bottom-0 z-30 space-y-2 border-t bg-white px-4 py-3 shadow-lg">
         <Button
           onClick={payWithPaystack}
-          disabled={!paystackCfg?.enabled || !paystackCfg?.public_key}
+          disabled={!canPay}
           className="h-14 w-full rounded-full bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
         >
-          {paystackCfg?.enabled && paystackCfg?.public_key
+          {canPay
             ? `Pay ₦${Number(amount || 0).toLocaleString()} — Card or Bank Transfer`
             : "Payments unavailable"}
         </Button>
