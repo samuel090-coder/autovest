@@ -114,7 +114,7 @@ function RechargePage() {
     const amt = Number(amount);
     if (!amt || amt < 100) return toast.error("Enter at least ₦100");
     const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).maybeSingle();
-    const email = prof?.email || `${userId}@investpro.local`;
+    const payEmail = prof?.email || `${userId}@investpro.local`;
     // 1) create pending tx
     const { data: tx, error: txErr } = await supabase
       .from("transactions")
@@ -127,7 +127,7 @@ function RechargePage() {
     const popup = new w.PaystackPop();
     popup.newTransaction({
       key: publicKey,
-      email,
+      email: payEmail,
       amount: amt * 100,
       currency: "NGN",
       metadata: { user_id: userId, transaction_id: tx.id },
