@@ -24,6 +24,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as PaymentIdRouteImport } from './routes/payment.$id'
 import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
@@ -110,6 +111,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const PaymentIdRoute = PaymentIdRouteImport.update({
+  id: '/payment/$id',
+  path: '/payment/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvestmentIdRoute = InvestmentIdRouteImport.update({
   id: '/investment/$id',
   path: '/investment/$id',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
+  '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
+  '/payment/$id': typeof PaymentIdRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
+  '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
+    | '/payment/$id'
     | '/admin/'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
+    | '/payment/$id'
     | '/admin'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
+    | '/payment/$id'
     | '/admin/'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -342,6 +354,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
+  PaymentIdRoute: typeof PaymentIdRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
   ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
 }
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/payment/$id': {
+      id: '/payment/$id'
+      path: '/payment/$id'
+      fullPath: '/payment/$id'
+      preLoaderRoute: typeof PaymentIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/investment/$id': {
       id: '/investment/$id'
@@ -566,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
+  PaymentIdRoute: PaymentIdRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
   ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
 }
