@@ -24,7 +24,7 @@ function AdminSettings() {
         <TabsList className="inline-flex w-max flex-nowrap gap-1">
           <TabsTrigger value="popups">Popups</TabsTrigger>
           <TabsTrigger value="recharge">Recharge</TabsTrigger>
-          <TabsTrigger value="paystack">Paystack</TabsTrigger>
+          <TabsTrigger value="bank">Bank</TabsTrigger>
           <TabsTrigger value="apk">APK</TabsTrigger>
           <TabsTrigger value="lucky">Lucky draw</TabsTrigger>
           <TabsTrigger value="freecash">Free cash</TabsTrigger>
