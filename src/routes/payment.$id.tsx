@@ -101,7 +101,7 @@ function PaymentPage() {
           <div className="mt-5 text-lg font-bold">Please wait…</div>
           <p className="mt-2 text-sm text-white/70">We are generating a virtual account number for your payment.</p>
           <div className="mx-auto mt-6 h-1.5 w-48 overflow-hidden rounded-full bg-white/15">
-            <div className="h-full w-1/3 animate-[shimmer_1.2s_infinite] rounded-full bg-emerald-400" />
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-emerald-400" />
           </div>
         </div>
       </div>
