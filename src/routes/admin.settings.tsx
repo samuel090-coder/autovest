@@ -24,7 +24,7 @@ function AdminSettings() {
         <TabsList className="inline-flex w-max flex-nowrap gap-1">
           <TabsTrigger value="popups">Popups</TabsTrigger>
           <TabsTrigger value="recharge">Recharge</TabsTrigger>
-          <TabsTrigger value="paystack">Paystack</TabsTrigger>
+          <TabsTrigger value="bank">Bank</TabsTrigger>
           <TabsTrigger value="apk">APK</TabsTrigger>
           <TabsTrigger value="lucky">Lucky draw</TabsTrigger>
           <TabsTrigger value="freecash">Free cash</TabsTrigger>
@@ -34,7 +34,7 @@ function AdminSettings() {
       </div>
       <TabsContent value="popups" className="space-y-4"><Announce1 /><Announce2 /></TabsContent>
       <TabsContent value="recharge"><RechargeEditor /></TabsContent>
-      <TabsContent value="paystack"><PaystackEditor /></TabsContent>
+      <TabsContent value="bank"><BankEditor /></TabsContent>
       <TabsContent value="apk"><ApkEditor /></TabsContent>
       <TabsContent value="lucky"><LuckyEditor /></TabsContent>
       <TabsContent value="freecash"><FreeCashAdmin /></TabsContent>
@@ -143,57 +143,53 @@ function RechargeEditor() {
   );
 }
 
-function PaystackEditor() {
-  const { data, save } = useSetting("paystack");
-  const [enabled, setEnabled] = useState(false);
-  const [publicKey, setPublicKey] = useState("");
-  const [mode, setMode] = useState<"live" | "test">("live");
-  useEffect(() => { if (!data) return; setEnabled(!!data.enabled); setPublicKey(data.public_key ?? ""); setMode((data.mode ?? "live") as any); }, [data]);
-  const webhookUrl = typeof window !== "undefined" ? `${window.location.origin}/api/public/hooks/paystack` : "/api/public/hooks/paystack";
-  function validatePublicKey() {
-    const key = publicKey.trim();
-    if (!enabled && !key) return null;
-    if (!/^pk_(live|test)_[A-Za-z0-9]+$/.test(key)) return "Paste the Paystack PUBLIC key only. It must start with pk_live_ or pk_test_.";
-    const keyMode = key.startsWith("pk_live_") ? "live" : "test";
-    if (keyMode !== mode) return `Mode is ${mode}, but this public key is for ${keyMode}.`;
-    const keyBody = key.replace(/^pk_(live|test)_/, "");
-    if (keyBody.length < 32 || keyBody.length > 64) return "This Paystack public key length looks invalid. Copy it again from Paystack.";
-    return null;
-  }
-  function savePaystack() {
-    const issue = validatePublicKey();
-    if (issue) return toast.error(issue);
-    save.mutate({ enabled, public_key: publicKey.trim(), mode });
+function BankEditor() {
+  const { data, save } = useSetting("manual_bank");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [tg, setTg] = useState("");
+  const [tgMsg, setTgMsg] = useState("");
+  const [note, setNote] = useState("");
+  useEffect(() => {
+    if (!data) return;
+    setBankName(data.bank_name ?? "");
+    setAccountNumber(data.account_number ?? "");
+    setAccountName(data.account_name ?? "");
+    setTg(data.telegram_username ?? "");
+    setTgMsg(data.telegram_message ?? "");
+    setNote(data.note ?? "");
+  }, [data]);
+  function onSave() {
+    if (!/^\d{6,20}$/.test(accountNumber.trim())) return toast.error("Enter a valid account number (digits only)");
+    if (!bankName.trim() || !accountName.trim()) return toast.error("Bank name and account name are required");
+    save.mutate({
+      bank_name: bankName.trim(),
+      account_number: accountNumber.trim(),
+      account_name: accountName.trim(),
+      telegram_username: tg.trim().replace(/^@/, ""),
+      telegram_message: tgMsg.trim(),
+      note: note.trim(),
+    });
   }
   return (
     <Card className="p-4 space-y-3">
-      <h3 className="font-semibold">Paystack payment integration</h3>
+      <h3 className="font-semibold">Virtual bank account (deposits)</h3>
       <p className="text-xs text-muted-foreground">
-        Paste your Paystack <b>public key</b> below — it must start with <code>pk_live_</code> (live) or <code>pk_test_</code> (sandbox).
-        If you see "Please enter a valid Key" on the Paystack checkout it means the key here is wrong, blank, or doesn't match the mode.
+        These details are shown on the payment page after a user starts a deposit. Users then request a payment token from your
+        Telegram support agent, and you issue that token from Admin → Transactions.
       </p>
-      <div className="flex items-center justify-between"><Label>Enabled</Label><Switch checked={enabled} onCheckedChange={setEnabled} /></div>
-      <div><Label className="text-xs">Public key</Label><Input value={publicKey} onChange={(e) => setPublicKey(e.target.value.trim())} placeholder="pk_live_…" /></div>
-      <div className="flex items-center gap-2"><Label>Mode</Label>
-        <select value={mode} onChange={(e) => setMode(e.target.value as any)} className="rounded border px-2 py-1 text-sm">
-          <option value="live">Live</option><option value="test">Test</option>
-        </select>
-      </div>
-      <Button onClick={savePaystack} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
-
-      <div className="mt-4 rounded-lg border bg-muted/40 p-3">
-        <div className="text-xs font-semibold">Webhook URL (paste this into Paystack → Settings → API Keys & Webhooks)</div>
-        <div className="mt-1 flex items-center gap-2">
-          <code className="flex-1 break-all rounded bg-background p-2 text-[11px]">{webhookUrl}</code>
-          <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(webhookUrl); toast.success("Webhook URL copied"); }}>Copy</Button>
-        </div>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          Set the same URL as your Webhook URL and Test Webhook URL. The <code>PAYSTACK_SECRET_KEY</code> server secret is already saved — it's used to verify signatures.
-        </p>
-      </div>
+      <div><Label className="text-xs">Account number</Label><Input inputMode="numeric" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value.replace(/[^0-9]/g, ""))} placeholder="0123456789" /></div>
+      <div><Label className="text-xs">Bank name</Label><Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="e.g. Moniepoint MFB" /></div>
+      <div><Label className="text-xs">Account name</Label><Input value={accountName} onChange={(e) => setAccountName(e.target.value)} placeholder="e.g. InvestPro Ltd" /></div>
+      <div><Label className="text-xs">Telegram support username</Label><Input value={tg} onChange={(e) => setTg(e.target.value)} placeholder="investpro_support" /></div>
+      <div><Label className="text-xs">Telegram pre-filled message</Label><Textarea rows={3} value={tgMsg} onChange={(e) => setTgMsg(e.target.value)} placeholder="Hello Support 👋, I have made a payment on InvestPro and I need my payment token." /></div>
+      <div><Label className="text-xs">Payment page note (optional)</Label><Textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Transfer the exact amount. Payments are confirmed within minutes." /></div>
+      <Button onClick={onSave} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save bank details"}</Button>
     </Card>
   );
 }
+
 
 function LuckyEditor() {
   const { data: rulesData, save: saveRules } = useSetting("lucky_draw_rules");

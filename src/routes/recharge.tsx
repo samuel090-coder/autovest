@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Info, Mail, LifeBuoy, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Info, Mail, LifeBuoy, Upload, Loader2, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +14,16 @@ import { uploadAndGetUrl } from "@/lib/storage";
 import { formatNaira } from "@/lib/format";
 
 export const Route = createFileRoute("/recharge")({
-  head: () => ({ meta: [{ title: "Recharge — InvestPro" }] }),
+  head: () => ({
+    meta: [
+      { title: "Recharge Wallet — InvestPro" },
+      { name: "description", content: "Fund your InvestPro wallet with a secure bank transfer to your generated virtual account." },
+      { property: "og:title", content: "Recharge Wallet — InvestPro" },
+      { property: "og:description", content: "Fund your InvestPro wallet with a secure bank transfer." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: RechargePage,
 });
 
@@ -24,40 +33,27 @@ type RechargeSettings = {
   instructions?: string;
 };
 
-function getPaystackKeyIssue(publicKey?: string, mode?: string) {
-  const key = (publicKey ?? "").trim();
-  if (!key) return "Paystack public key is missing.";
-  if (!/^pk_(live|test)_[A-Za-z0-9]+$/.test(key)) {
-    return "Paystack public key must start with pk_live_ or pk_test_.";
-  }
-  const keyMode = key.startsWith("pk_live_") ? "live" : "test";
-  if ((mode === "live" || mode === "test") && keyMode !== mode) {
-    return `Paystack is set to ${mode} mode, but the public key is for ${keyMode} mode.`;
-  }
-  const keyBody = key.replace(/^pk_(live|test)_/, "");
-  if (keyBody.length < 32 || keyBody.length > 64) {
-    return "Paystack public key length looks invalid. Copy the full public key again from Paystack.";
-  }
-  return null;
-}
-
 function RechargePage() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const [userId, setUserId] = useState<string | null>(null);
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
   const [amount, setAmount] = useState<string>("66000");
+  const [starting, setStarting] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) return navigate({ to: "/auth" });
+      if (!data.session) {
+        navigate({ to: "/auth" });
+        return;
+      }
       setUserId(data.session.user.id);
       supabase
-  .from("profiles")
-  .select("email")
-  .eq("id", data.session.user.id)
-  .maybeSingle()
-  .then(({ data: p }) => setEmail(p?.email ?? ""));
+        .from("profiles")
+        .select("email")
+        .eq("id", data.session.user.id)
+        .maybeSingle()
+        .then(({ data: p }) => setEmail(p?.email ?? ""));
+    });
   }, [navigate]);
 
   const { data: wallet } = useQuery({
@@ -74,77 +70,34 @@ function RechargePage() {
     },
   });
 
-  const { data: paystackCfg } = useQuery({
-    queryKey: ["paystack-cfg"],
-    queryFn: async () => {
-      const { data } = await supabase.from("site_settings").select("value").eq("key", "paystack").maybeSingle();
-      return (data?.value as { enabled?: boolean; public_key?: string; mode?: string }) ?? {};
-    },
-  });
-
   const presets = settings?.presets ?? [];
   const bonusMap = settings?.bonus_map ?? {};
   const instructions = settings?.instructions ?? "";
-  const paystackKeyIssue = getPaystackKeyIssue(paystackCfg?.public_key, paystackCfg?.mode);
-  const canPay = !!paystackCfg?.enabled && !paystackKeyIssue;
 
-  // Inject Paystack inline script once
-  useEffect(() => {
-    if (!paystackCfg?.enabled) return;
-    if (document.getElementById("paystack-inline")) return;
-    const s = document.createElement("script");
-    s.id = "paystack-inline";
-    s.src = "https://js.paystack.co/v2/inline.js";
-    s.async = true;
-    document.head.appendChild(s);
-  }, [paystackCfg?.enabled]);
-
-  // (removed manual-transfer submission — Paystack is the only method)
-
-  async function payWithPaystack() {
+  async function startPayment() {
     if (!userId) return navigate({ to: "/auth" });
-    if (!paystackCfg?.enabled) {
-      return toast.error("Payments are temporarily disabled. Please contact support.");
-    }
-    const publicKey = paystackCfg.public_key?.trim() ?? "";
-    const keyIssue = getPaystackKeyIssue(publicKey, paystackCfg.mode);
-    if (keyIssue) {
-      return toast.error(keyIssue);
-    }
     const amt = Number(amount);
     if (!amt || amt < 100) return toast.error("Enter at least ₦100");
-    const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).maybeSingle();
-    const payEmail = prof?.email || `${userId}@investpro.local`;
-    // 1) create pending tx
-    const { data: tx, error: txErr } = await supabase
-      .from("transactions")
-      .insert({ user_id: userId, type: "recharge", amount: amt, status: "pending", meta: { method: "paystack" } })
-      .select("id").single();
-    if (txErr || !tx) return toast.error(txErr?.message ?? "Could not start payment");
-    // 2) open inline
-    const w = window as any;
-    if (!w.PaystackPop) return toast.error("Paystack script not loaded yet — try again");
-    const popup = new w.PaystackPop();
-    popup.newTransaction({
-      key: publicKey,
-      email: payEmail,
-      amount: amt * 100,
-      currency: "NGN",
-      metadata: { user_id: userId, transaction_id: tx.id },
-      onSuccess: () => {
-        toast.success("Payment received — wallet will update shortly");
-        qc.invalidateQueries({ queryKey: ["wallet"] });
-        setTimeout(() => navigate({ to: "/" }), 1500);
-      },
-      onCancel: () => toast.info("Payment cancelled"),
-    });
+    setStarting(true);
+    try {
+      const { data: tx, error } = await supabase
+        .from("transactions")
+        .insert({ user_id: userId, type: "recharge", amount: amt, status: "pending", meta: { method: "bank_transfer" } })
+        .select("id")
+        .single();
+      if (error || !tx) throw new Error(error?.message ?? "Could not start payment");
+      navigate({ to: "/payment/$id", params: { id: tx.id } });
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not start payment");
+    } finally {
+      setStarting(false);
+    }
   }
 
   const headerBg = useMemo(() => "bg-gradient-to-b from-[#fdf6e8] to-[#fdebd0]", []);
 
   return (
     <div className={`min-h-screen ${headerBg} pb-32`}>
-      {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <button onClick={() => history.back()} aria-label="Back" className="grid h-9 w-9 place-items-center rounded-full">
           <ArrowLeft className="h-5 w-5" />
@@ -153,27 +106,22 @@ function RechargePage() {
         <Link to="/orders" className="text-sm text-foreground/80">Record</Link>
       </div>
 
-      {/* email + balance card */}
       <div className="px-4 pt-3">
         <div className="rounded-2xl bg-[#fce0a0] p-4 shadow-sm">
           <div className="text-sm font-medium">Email address</div>
           <div className="mt-2 flex items-center gap-3 rounded-xl bg-white px-3 py-3 shadow-inner">
-            <span className="text-xl font-bold text-[#7a2e0e] tracking-wide flex-1">{email || "—"}</span>
-            <Mail className="h-5 w-5 text-[#a14a1a]" />
+            <span className="flex-1 break-all text-lg font-bold tracking-wide text-[#7a2e0e]">{email || "—"}</span>
+            <Mail className="h-5 w-5 shrink-0 text-[#a14a1a]" />
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div className="text-sm">
-              Balance(₦):{" "}
-              <span className="text-lg font-bold">{Number(wallet?.balance ?? 0).toLocaleString()}</span>
+              Balance(₦): <span className="text-lg font-bold">{Number(wallet?.balance ?? 0).toLocaleString()}</span>
             </div>
-            <Link to="/orders" className="rounded-full bg-white px-3 py-1 text-sm font-medium shadow-sm">
-              Bill ›
-            </Link>
+            <Link to="/orders" className="rounded-full bg-white px-3 py-1 text-sm font-medium shadow-sm">Bill ›</Link>
           </div>
         </div>
       </div>
 
-      {/* Amount grid */}
       <div className="px-4 pt-4">
         <div className="rounded-2xl bg-[#fce0a0]/80 p-4">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
@@ -218,46 +166,37 @@ function RechargePage() {
         </div>
       </div>
 
-      {/* Paystack-only info card */}
       <div className="px-4 pt-5">
         <div className="rounded-2xl bg-white p-4 shadow-sm">
           <div className="flex items-center gap-2 text-base font-bold">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-600 text-white">P</span>
-            Paystack — secure payment
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-600 text-white">
+              <Landmark className="h-4 w-4" />
+            </span>
+            Bank Transfer — Virtual Account
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            We accept payments via Paystack. You can pay using your <b>bank card (Visa / Mastercard / Verve)</b> <i>or</i> via <b>bank transfer</b> — Paystack will show you both options on the payment page. Funds reflect instantly after confirmation.
+            Tap continue and we will generate a virtual account number for your deposit. Transfer the exact amount, then get your
+            payment token from our support team on Telegram to confirm the deposit instantly.
           </p>
-          {!canPay ? (
-            <div className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
-              {paystackCfg?.enabled ? paystackKeyIssue : "Payments are temporarily disabled. Please contact support."}
-            </div>
-          ) : null}
         </div>
       </div>
 
-      {/* Instructions */}
       {instructions && (
         <div className="px-4 pt-5">
           <div className="text-base font-bold">Notes:</div>
-          <div className="mt-2 whitespace-pre-wrap text-[15px] leading-relaxed">{instructions}</div>
+          <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-relaxed">{instructions}</div>
         </div>
       )}
 
-      {/* Payment complaint / support */}
       <ComplaintSection userId={userId} />
 
-
-      {/* Sticky CTA — Paystack only */}
       <div className="fixed inset-x-0 bottom-0 z-30 space-y-2 border-t bg-white px-4 py-3 shadow-lg">
         <Button
-          onClick={payWithPaystack}
-          disabled={!canPay}
+          onClick={startPayment}
+          disabled={starting}
           className="h-14 w-full rounded-full bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
         >
-          {canPay
-            ? `Pay ₦${Number(amount || 0).toLocaleString()} — Card or Bank Transfer`
-            : "Payments unavailable"}
+          {starting ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Preparing…</> : `Pay ₦${Number(amount || 0).toLocaleString()} — Bank Transfer`}
         </Button>
       </div>
 
@@ -298,11 +237,7 @@ function ComplaintSection({ userId }: { userId: string | null }) {
       let screenshot_url: string | null = null;
       if (file) {
         const ext = file.name.split(".").pop() ?? "jpg";
-        screenshot_url = await uploadAndGetUrl(
-          "complaint-proofs",
-          file,
-          `${userId}/${crypto.randomUUID()}.${ext}`,
-        );
+        screenshot_url = await uploadAndGetUrl("complaint-proofs", file, `${userId}/${crypto.randomUUID()}.${ext}`);
       }
       const { error } = await (supabase as any).from("payment_complaints").insert({
         user_id: userId,
@@ -369,33 +304,18 @@ function ComplaintSection({ userId }: { userId: string | null }) {
           <div className="space-y-3">
             <div>
               <Label>Amount paid (₦)</Label>
-              <Input
-                inputMode="numeric"
-                value={amt}
-                onChange={(e) => setAmt(e.target.value.replace(/[^0-9]/g, ""))}
-                placeholder="e.g. 66000"
-              />
+              <Input inputMode="numeric" value={amt} onChange={(e) => setAmt(e.target.value.replace(/[^0-9]/g, ""))} placeholder="e.g. 66000" />
             </div>
             <div>
               <Label>Describe the issue</Label>
-              <Textarea
-                rows={4}
-                value={desc}
-                onChange={(e) => setDesc(e.target.value)}
-                placeholder="When did you pay? Which method? Any transaction reference?"
-              />
+              <Textarea rows={4} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="When did you pay? Which method? Any transaction reference?" />
             </div>
             <div>
               <Label>Payment screenshot (optional but recommended)</Label>
               <label className="mt-1 flex cursor-pointer items-center gap-2 rounded-md border border-dashed p-3 text-sm hover:bg-muted/50">
                 <Upload className="h-4 w-4" />
                 <span className="truncate">{file ? file.name : "Choose image…"}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                />
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
               </label>
             </div>
             <Button onClick={submit} disabled={busy} className="w-full bg-emerald-600 hover:bg-emerald-700">
