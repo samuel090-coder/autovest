@@ -714,10 +714,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      issue_payment_token: { Args: { _tx_id: string }; Returns: string }
       lucky_claim: { Args: never; Returns: Json }
       lucky_spin: { Args: never; Returns: Json }
       lucky_sync_referrals: { Args: never; Returns: Json }
       redeem_free_cash: { Args: { _code: string }; Returns: Json }
+      redeem_payment_token: {
+        Args: { _token: string; _tx_id: string }
+        Returns: Json
+      }
       start_next_round: { Args: { _uinv_id: string }; Returns: Json }
     }
     Enums: {
