@@ -34,7 +34,7 @@ function AdminSettings() {
       </div>
       <TabsContent value="popups" className="space-y-4"><Announce1 /><Announce2 /></TabsContent>
       <TabsContent value="recharge"><RechargeEditor /></TabsContent>
-      <TabsContent value="paystack"><PaystackEditor /></TabsContent>
+      <TabsContent value="bank"><BankEditor /></TabsContent>
       <TabsContent value="apk"><ApkEditor /></TabsContent>
       <TabsContent value="lucky"><LuckyEditor /></TabsContent>
       <TabsContent value="freecash"><FreeCashAdmin /></TabsContent>
