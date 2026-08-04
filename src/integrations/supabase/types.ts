@@ -640,6 +640,7 @@ export type Database = {
       wallets: {
         Row: {
           balance: number
+          bonus_balance: number
           cumulative_income: number
           referral_bonus: number
           team_size: number
@@ -649,6 +650,7 @@ export type Database = {
         }
         Insert: {
           balance?: number
+          bonus_balance?: number
           cumulative_income?: number
           referral_bonus?: number
           team_size?: number
@@ -658,6 +660,7 @@ export type Database = {
         }
         Update: {
           balance?: number
+          bonus_balance?: number
           cumulative_income?: number
           referral_bonus?: number
           team_size?: number

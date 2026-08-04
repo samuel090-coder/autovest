@@ -85,6 +85,10 @@ function WalletPage() {
             <span className="text-lg font-semibold">My Wallet</span>
           </div>
           <div className="mt-3 text-sm text-muted-foreground">Balance: <span className="text-3xl font-bold text-foreground align-middle">{Number(wallet?.balance ?? 0).toLocaleString()}</span></div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            Bonus balance: <span className="font-semibold text-foreground">{formatNaira((wallet as { bonus_balance?: number } | null)?.bonus_balance ?? 0)}</span>
+            <span className="ml-1">(reward money — cannot be used to buy investments)</span>
+          </div>
           <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs">
             <Mini value={Number(todayIncome).toLocaleString()} label="No income received today(₦)" />
             <Mini value={Number(wallet?.cumulative_income ?? 0).toLocaleString()} label="Cumulative income(₦)" />
