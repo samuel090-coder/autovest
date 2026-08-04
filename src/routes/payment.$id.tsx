@@ -43,6 +43,8 @@ function PaymentPage() {
   const [generating, setGenerating] = useState(true);
   const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
 
   useEffect(() => {
     const t = setTimeout(() => setGenerating(false), 3200);
