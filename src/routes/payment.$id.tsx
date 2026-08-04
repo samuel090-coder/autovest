@@ -140,74 +140,113 @@ function PaymentPage() {
         </div>
       ) : (
         <>
-          <div className="px-4 pt-3">
-            <div className="rounded-2xl bg-[#0b2f26] p-5 text-white shadow-sm">
-              <div className="flex items-center gap-2 text-sm text-emerald-300">
-                <Landmark className="h-4 w-4" /> Virtual account generated
-              </div>
-              <div className="mt-3 text-3xl font-extrabold tracking-wide">{formatNaira(amount)}</div>
-              <div className="mt-1 text-xs text-white/60">Transfer this exact amount</div>
+          {step === 1 ? (
+            <>
+              <div className="px-4 pt-3">
+                <div className="rounded-2xl bg-[#0b2f26] p-5 text-white shadow-sm">
+                  <div className="flex items-center gap-2 text-sm text-emerald-300">
+                    <Landmark className="h-4 w-4" /> Virtual account generated
+                  </div>
+                  <div className="mt-3 text-3xl font-extrabold tracking-wide">{formatNaira(amount)}</div>
+                  <div className="mt-1 text-xs text-white/60">Transfer this exact amount</div>
 
-              <div className="mt-4 space-y-2 rounded-xl bg-white/10 p-3">
-                <Row label="Account number" value={cfg?.account_number ?? "—"} onCopy={() => copy(cfg?.account_number ?? "", "Account number")} big />
-                <Row label="Bank name" value={cfg?.bank_name ?? "—"} onCopy={() => copy(cfg?.bank_name ?? "", "Bank name")} />
-                <Row label="Account name" value={cfg?.account_name ?? "—"} onCopy={() => copy(cfg?.account_name ?? "", "Account name")} />
-                <Row label="Reference" value={reference} onCopy={() => copy(reference, "Reference")} />
+                  <div className="mt-4 space-y-2 rounded-xl bg-white/10 p-3">
+                    <Row
+                      label="Account number"
+                      value={cfg?.account_number ?? "—"}
+                      onCopy={() => { copy(cfg?.account_number ?? "", "Account number"); setCopiedAccount(true); }}
+                      big
+                    />
+                    <Row label="Bank name" value={cfg?.bank_name ?? "—"} onCopy={() => copy(cfg?.bank_name ?? "", "Bank name")} />
+                    <Row label="Account name" value={cfg?.account_name ?? "—"} onCopy={() => copy(cfg?.account_name ?? "", "Account name")} />
+                    <Row label="Reference" value={reference} onCopy={() => copy(reference, "Reference")} />
+                  </div>
+                  <p className="mt-3 text-[11px] leading-relaxed text-white/60">
+                    This account is reserved for this transaction only. Do not reuse it for future payments.
+                  </p>
+                </div>
               </div>
-              <p className="mt-3 text-[11px] leading-relaxed text-white/60">
-                This account is reserved for this transaction only. Do not reuse it for future payments.
-              </p>
-            </div>
-          </div>
 
-          {cfg?.note && (
-            <div className="px-4 pt-4">
-              <div className="rounded-2xl bg-amber-50 p-4 text-sm leading-relaxed text-amber-900 whitespace-pre-wrap break-words">{cfg.note}</div>
-            </div>
+              {cfg?.note && (
+                <div className="px-4 pt-4">
+                  <div className="rounded-2xl bg-amber-50 p-4 text-sm leading-relaxed text-amber-900 whitespace-pre-wrap break-words">{cfg.note}</div>
+                </div>
+              )}
+
+              <div className="px-4 pt-4">
+                <Button
+                  onClick={() => setStep(2)}
+                  disabled={!copiedAccount}
+                  className="h-12 w-full rounded-full bg-emerald-600 text-base font-semibold hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  I have made the payment
+                </Button>
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  {copiedAccount ? "Tap to continue and get your payment token." : "Copy the account number first to continue."}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="px-4 pt-3">
+                <div className="rounded-2xl bg-[#0b2f26] p-4 text-white shadow-sm">
+                  <div className="text-xs text-white/60">Amount paid</div>
+                  <div className="text-2xl font-extrabold">{formatNaira(amount)}</div>
+                  <div className="mt-1 text-xs text-white/60">Reference: {reference}</div>
+                </div>
+              </div>
+
+              <div className="px-4 pt-4">
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <div className="flex items-center gap-2 text-base font-bold">
+                    <Send className="h-5 w-5 text-sky-500" /> Step 2 — Get your payment token
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Chat with our support team on Telegram to receive your payment token.
+                  </p>
+                  <Button
+                    asChild={!!tgLink}
+                    disabled={!tgLink}
+                    className="mt-3 h-12 w-full rounded-full bg-sky-500 text-sm font-semibold text-white hover:bg-sky-600"
+                  >
+                    {tgLink ? (
+                      <a href={tgLink} target="_blank" rel="noreferrer"><Send className="mr-2 h-4 w-4" /> Chat with support on Telegram</a>
+                    ) : (
+                      <span>Telegram support unavailable</span>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="px-4 pt-4">
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <div className="flex items-center gap-2 text-base font-bold">
+                    <ShieldCheck className="h-5 w-5 text-emerald-600" /> Step 3 — Enter payment token
+                  </div>
+                  <Input
+                    value={token}
+                    onChange={(e) => setToken(e.target.value.toUpperCase())}
+                    placeholder="e.g. A1B2C3D4"
+                    className="mt-3 h-12 text-center text-lg font-bold tracking-[0.3em]"
+                  />
+                  <Button onClick={submitToken} disabled={busy} className="mt-3 h-12 w-full rounded-full bg-emerald-600 hover:bg-emerald-700">
+                    {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying…</> : "Confirm Payment"}
+                  </Button>
+                  <p className="mt-2 text-center text-xs text-muted-foreground">
+                    Your wallet is credited instantly once the token is verified.
+                  </p>
+                </div>
+              </div>
+
+              <div className="px-4 pt-4">
+                <button onClick={() => setStep(1)} className="w-full text-center text-sm text-muted-foreground underline">
+                  Back to account details
+                </button>
+              </div>
+            </>
           )}
-
-          <div className="px-4 pt-4">
-            <div className="rounded-2xl bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-2 text-base font-bold">
-                <Send className="h-5 w-5 text-sky-500" /> Step 2 — Get your payment token
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                After transferring, chat with our support team on Telegram to receive your payment token.
-              </p>
-              <Button
-                asChild={!!tgLink}
-                disabled={!tgLink}
-                className="mt-3 h-12 w-full rounded-full bg-sky-500 text-sm font-semibold text-white hover:bg-sky-600"
-              >
-                {tgLink ? (
-                  <a href={tgLink} target="_blank" rel="noreferrer"><Send className="mr-2 h-4 w-4" /> Chat with support on Telegram</a>
-                ) : (
-                  <span>Telegram support unavailable</span>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <div className="px-4 pt-4">
-            <div className="rounded-2xl bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-2 text-base font-bold">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" /> Step 3 — Enter payment token
-              </div>
-              <Input
-                value={token}
-                onChange={(e) => setToken(e.target.value.toUpperCase())}
-                placeholder="e.g. A1B2C3D4"
-                className="mt-3 h-12 text-center text-lg font-bold tracking-[0.3em]"
-              />
-              <Button onClick={submitToken} disabled={busy} className="mt-3 h-12 w-full rounded-full bg-emerald-600 hover:bg-emerald-700">
-                {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying…</> : "Confirm Payment"}
-              </Button>
-              <p className="mt-2 text-center text-xs text-muted-foreground">
-                Your wallet is credited instantly once the token is verified.
-              </p>
-            </div>
-          </div>
         </>
+
       )}
     </div>
   );
