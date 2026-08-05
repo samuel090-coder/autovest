@@ -127,14 +127,40 @@ function WithdrawPage() {
             <div className="text-sm">{bank.bank_name} · ****{bank.account_number.slice(-4)}</div>
             <button onClick={() => setEditing(true)} className="text-brand mt-2 text-xs font-semibold">Edit bank</button>
           </div>
-          <div className="rounded-2xl bg-card p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Available balance</span>
-              <span className="text-brand text-lg font-bold">{formatNaira(wallet?.balance ?? 0)}</span>
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              { key: "balance" as const, label: "Main balance", value: Number(wallet?.balance ?? 0) },
+              { key: "bonus" as const, label: "Reward balance", value: bonusBalance },
+            ]).map((s) => (
+              <button
+                key={s.key}
+                onClick={() => setSource(s.key)}
+                className={`rounded-2xl p-3 text-left shadow-sm ${source === s.key ? "bg-brand text-white" : "bg-card"}`}
+              >
+                <div className="text-xs opacity-80">{s.label}</div>
+                <div className="text-lg font-bold">{formatNaira(s.value)}</div>
+              </button>
+            ))}
           </div>
+
+          {source === "bonus" && !hasActiveInvestment && (
+            <div className="rounded-2xl border border-warning/40 bg-warning/10 p-4">
+              <div className="text-sm font-semibold">Active investment required</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Reward money can only be withdrawn while you have an investment running. Purchase an investment first, then come back to withdraw your reward.
+              </p>
+              <Link to="/" className="bg-brand mt-3 inline-flex h-10 items-center rounded-full px-4 text-xs font-bold text-white">
+                Buy an investment
+              </Link>
+            </div>
+          )}
+
           <Field label="Amount to withdraw (₦)"><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" /></Field>
-          <Button onClick={() => submitWithdraw.mutate()} disabled={submitWithdraw.isPending} className="bg-brand h-12 w-full rounded-full text-white">
+          <Button
+            onClick={() => submitWithdraw.mutate()}
+            disabled={submitWithdraw.isPending || (source === "bonus" && !hasActiveInvestment)}
+            className="bg-brand h-12 w-full rounded-full text-white"
+          >
             {submitWithdraw.isPending ? "Submitting…" : "Request withdrawal"}
           </Button>
           <p className="text-center text-xs text-muted-foreground">Withdrawals are reviewed by admin within 24h. Balance is held while pending.</p>
