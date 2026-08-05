@@ -33,11 +33,24 @@ function WithdrawPage() {
     queryFn: async () => (await supabase.from("bank_accounts").select("*").eq("user_id", userId!).eq("is_default", true).maybeSingle()).data,
   });
 
+  const { data: activeInvestments = 0 } = useQuery({
+    queryKey: ["active-investments", userId], enabled: !!userId,
+    queryFn: async () => {
+      const { count } = await supabase.from("user_investments").select("id", { count: "exact", head: true })
+        .eq("user_id", userId!).is("claimed_at", null).gt("price_paid", 0);
+      return count ?? 0;
+    },
+  });
+
   const [editing, setEditing] = useState(false);
   const [holder, setHolder] = useState("");
   const [bankName, setBankName] = useState(BANKS[0]);
   const [acct, setAcct] = useState("");
   const [amount, setAmount] = useState("");
+  const [source, setSource] = useState<"balance" | "bonus">("balance");
+
+  const bonusBalance = Number((wallet as { bonus_balance?: number } | null)?.bonus_balance ?? 0);
+  const hasActiveInvestment = activeInvestments > 0;
 
   useEffect(() => {
     if (bank) { setHolder(bank.holder_name); setBankName(bank.bank_name); setAcct(bank.account_number); }
@@ -64,10 +77,19 @@ function WithdrawPage() {
       if (!userId || !bank) throw new Error("Bind your bank first");
       const amt = Number(amount);
       if (!amt || amt <= 0) throw new Error("Enter an amount");
+
+      if (source === "bonus") {
+        if (!hasActiveInvestment) throw new Error("Purchase an active investment first to withdraw reward money");
+        if (amt > bonusBalance) throw new Error("Insufficient reward balance");
+        const { error } = await supabase.rpc("withdraw_bonus", { _amount: amt, _bank_account_id: bank.id });
+        if (error) throw error;
+        return;
+      }
+
       if (amt > Number(wallet?.balance ?? 0)) throw new Error("Insufficient balance");
       const { error: txErr } = await supabase.from("transactions").insert({
         user_id: userId, type: "withdraw", amount: amt, status: "pending",
-        meta: { bank_account_id: bank.id, holder_name: bank.holder_name, bank_name: bank.bank_name, account_number: bank.account_number },
+        meta: { source: "balance", bank_account_id: bank.id, holder_name: bank.holder_name, bank_name: bank.bank_name, account_number: bank.account_number },
       });
       if (txErr) throw txErr;
       const { error: wErr } = await supabase.from("wallets").update({ balance: Number(wallet!.balance) - amt }).eq("user_id", userId);
@@ -105,14 +127,40 @@ function WithdrawPage() {
             <div className="text-sm">{bank.bank_name} · ****{bank.account_number.slice(-4)}</div>
             <button onClick={() => setEditing(true)} className="text-brand mt-2 text-xs font-semibold">Edit bank</button>
           </div>
-          <div className="rounded-2xl bg-card p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Available balance</span>
-              <span className="text-brand text-lg font-bold">{formatNaira(wallet?.balance ?? 0)}</span>
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              { key: "balance" as const, label: "Main balance", value: Number(wallet?.balance ?? 0) },
+              { key: "bonus" as const, label: "Reward balance", value: bonusBalance },
+            ]).map((s) => (
+              <button
+                key={s.key}
+                onClick={() => setSource(s.key)}
+                className={`rounded-2xl p-3 text-left shadow-sm ${source === s.key ? "bg-brand text-white" : "bg-card"}`}
+              >
+                <div className="text-xs opacity-80">{s.label}</div>
+                <div className="text-lg font-bold">{formatNaira(s.value)}</div>
+              </button>
+            ))}
           </div>
+
+          {source === "bonus" && !hasActiveInvestment && (
+            <div className="rounded-2xl border border-warning/40 bg-warning/10 p-4">
+              <div className="text-sm font-semibold">Active investment required</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Reward money can only be withdrawn while you have an investment running. Purchase an investment first, then come back to withdraw your reward.
+              </p>
+              <Link to="/" className="bg-brand mt-3 inline-flex h-10 items-center rounded-full px-4 text-xs font-bold text-white">
+                Buy an investment
+              </Link>
+            </div>
+          )}
+
           <Field label="Amount to withdraw (₦)"><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" /></Field>
-          <Button onClick={() => submitWithdraw.mutate()} disabled={submitWithdraw.isPending} className="bg-brand h-12 w-full rounded-full text-white">
+          <Button
+            onClick={() => submitWithdraw.mutate()}
+            disabled={submitWithdraw.isPending || (source === "bonus" && !hasActiveInvestment)}
+            className="bg-brand h-12 w-full rounded-full text-white"
+          >
             {submitWithdraw.isPending ? "Submitting…" : "Request withdrawal"}
           </Button>
           <p className="text-center text-xs text-muted-foreground">Withdrawals are reviewed by admin within 24h. Balance is held while pending.</p>
