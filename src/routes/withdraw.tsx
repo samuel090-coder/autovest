@@ -33,11 +33,24 @@ function WithdrawPage() {
     queryFn: async () => (await supabase.from("bank_accounts").select("*").eq("user_id", userId!).eq("is_default", true).maybeSingle()).data,
   });
 
+  const { data: activeInvestments = 0 } = useQuery({
+    queryKey: ["active-investments", userId], enabled: !!userId,
+    queryFn: async () => {
+      const { count } = await supabase.from("user_investments").select("id", { count: "exact", head: true })
+        .eq("user_id", userId!).is("claimed_at", null).gt("price_paid", 0);
+      return count ?? 0;
+    },
+  });
+
   const [editing, setEditing] = useState(false);
   const [holder, setHolder] = useState("");
   const [bankName, setBankName] = useState(BANKS[0]);
   const [acct, setAcct] = useState("");
   const [amount, setAmount] = useState("");
+  const [source, setSource] = useState<"balance" | "bonus">("balance");
+
+  const bonusBalance = Number((wallet as { bonus_balance?: number } | null)?.bonus_balance ?? 0);
+  const hasActiveInvestment = activeInvestments > 0;
 
   useEffect(() => {
     if (bank) { setHolder(bank.holder_name); setBankName(bank.bank_name); setAcct(bank.account_number); }
@@ -64,10 +77,19 @@ function WithdrawPage() {
       if (!userId || !bank) throw new Error("Bind your bank first");
       const amt = Number(amount);
       if (!amt || amt <= 0) throw new Error("Enter an amount");
+
+      if (source === "bonus") {
+        if (!hasActiveInvestment) throw new Error("Purchase an active investment first to withdraw reward money");
+        if (amt > bonusBalance) throw new Error("Insufficient reward balance");
+        const { error } = await supabase.rpc("withdraw_bonus", { _amount: amt, _bank_account_id: bank.id });
+        if (error) throw error;
+        return;
+      }
+
       if (amt > Number(wallet?.balance ?? 0)) throw new Error("Insufficient balance");
       const { error: txErr } = await supabase.from("transactions").insert({
         user_id: userId, type: "withdraw", amount: amt, status: "pending",
-        meta: { bank_account_id: bank.id, holder_name: bank.holder_name, bank_name: bank.bank_name, account_number: bank.account_number },
+        meta: { source: "balance", bank_account_id: bank.id, holder_name: bank.holder_name, bank_name: bank.bank_name, account_number: bank.account_number },
       });
       if (txErr) throw txErr;
       const { error: wErr } = await supabase.from("wallets").update({ balance: Number(wallet!.balance) - amt }).eq("user_id", userId);
