@@ -647,6 +647,7 @@ export type Database = {
           total_withdrawals: number
           updated_at: string
           user_id: string
+          welcome_bonus_claimed: boolean
         }
         Insert: {
           balance?: number
@@ -657,6 +658,7 @@ export type Database = {
           total_withdrawals?: number
           updated_at?: string
           user_id: string
+          welcome_bonus_claimed?: boolean
         }
         Update: {
           balance?: number
@@ -667,6 +669,7 @@ export type Database = {
           total_withdrawals?: number
           updated_at?: string
           user_id?: string
+          welcome_bonus_claimed?: boolean
         }
         Relationships: []
       }
@@ -709,6 +712,7 @@ export type Database = {
     }
     Functions: {
       claim_investment: { Args: { _uinv_id: string }; Returns: Json }
+      claim_welcome_bonus: { Args: never; Returns: Json }
       complete_bonus_watch: { Args: { _video_id: string }; Returns: Json }
       has_role: {
         Args: {
@@ -727,6 +731,10 @@ export type Database = {
         Returns: Json
       }
       start_next_round: { Args: { _uinv_id: string }; Returns: Json }
+      withdraw_bonus: {
+        Args: { _amount: number; _bank_account_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
