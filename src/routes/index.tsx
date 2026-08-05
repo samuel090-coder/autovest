@@ -65,6 +65,7 @@ function Home() {
 
   return (
     <AppShell>
+      <WelcomeBonusPopup userId={userId} />
       {/* Balance card */}
       <div className="px-4 pt-4">
         <div className="bg-balance-card relative overflow-hidden rounded-2xl p-5 text-white shadow-lg">
