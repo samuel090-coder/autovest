@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           // 2) AI caption + amount via chat completion (amount/caption only)
           const captionRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
             body: JSON.stringify({
               model: "google/gemini-2.5-flash",
               messages: [
@@ -55,11 +55,30 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
               response_format: { type: "json_object" },
             }),
           });
-          if (!captionRes.ok) return new Response("ai failed", { status: 500 });
-          const cj = await captionRes.json();
-          const parsed = JSON.parse(cj.choices?.[0]?.message?.content ?? "{}");
-          const amount = Number(parsed.amount ?? 5000);
-          const caption = String(parsed.caption ?? "Thanks InvestPro 🎉").slice(0, 80);
+          // Fallback pool so the feed keeps running even when AI credits are exhausted
+          const fallbackCaptions = [
+            "Boss don land 💸", "Withdrawal hit my GTB account sharp sharp 🙌",
+            "Thank you InvestPro, e dey work 💯", "Just collected my profit today ❤️",
+            "Money don enter, no stress 🚀", "Payment confirmed in 3 minutes 🔥",
+            "I no believe am, but e land 😍", "Second withdrawal this week 💪",
+            "Opay alert don enter 🎉", "Cash out successful, God bless InvestPro 🙏",
+          ];
+          const band = Math.random();
+          let amount = band < 0.55 ? Math.floor(1500 + Math.random() * 28500)
+            : band < 0.85 ? Math.floor(30000 + Math.random() * 120000)
+            : Math.floor(150000 + Math.random() * 800000);
+          let caption = fallbackCaptions[Math.floor(Math.random() * fallbackCaptions.length)];
+          let aiOk = false;
+          if (captionRes.ok) {
+            try {
+              const cj = await captionRes.json();
+              const parsed = JSON.parse(cj.choices?.[0]?.message?.content ?? "{}");
+              if (parsed.amount) amount = Number(parsed.amount);
+              if (parsed.caption) caption = String(parsed.caption).slice(0, 80);
+              aiOk = true;
+            } catch {}
+          }
+
 
 
           // 3) Realistic mobile bank screenshot via Gemini image (uses chat-completions image shape)
@@ -67,7 +86,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           try {
             const imgRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
               method: "POST",
-              headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
               body: JSON.stringify({
                 model: "google/gemini-2.5-flash-image",
                 messages: [{
@@ -107,7 +126,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           });
           if (!ins.ok) return new Response(`insert failed ${await ins.text()}`, { status: 500 });
 
-          return new Response(JSON.stringify({ ok: true, amount, caption }), {
+          return new Response(JSON.stringify({ ok: true, amount, caption, aiOk, image: !!imageUrl }), {
             headers: { "Content-Type": "application/json" },
           });
         } catch (e: any) {
