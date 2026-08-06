@@ -123,7 +123,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           });
           if (!ins.ok) return new Response(`insert failed ${await ins.text()}`, { status: 500 });
 
-          return new Response(JSON.stringify({ ok: true, amount, caption }), {
+          return new Response(JSON.stringify({ ok: true, amount, caption, aiOk, image: !!imageUrl }), {
             headers: { "Content-Type": "application/json" },
           });
         } catch (e: any) {
