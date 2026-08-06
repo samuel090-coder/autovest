@@ -63,7 +63,10 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
             "I no believe am, but e land 😍", "Second withdrawal this week 💪",
             "Opay alert don enter 🎉", "Cash out successful, God bless InvestPro 🙏",
           ];
-          let amount = Math.floor(1500 + Math.random() * 940000);
+          const band = Math.random();
+          let amount = band < 0.55 ? Math.floor(1500 + Math.random() * 28500)
+            : band < 0.85 ? Math.floor(30000 + Math.random() * 120000)
+            : Math.floor(150000 + Math.random() * 800000);
           let caption = fallbackCaptions[Math.floor(Math.random() * fallbackCaptions.length)];
           let aiOk = false;
           if (captionRes.ok) {
