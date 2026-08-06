@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           // 2) AI caption + amount via chat completion (amount/caption only)
           const captionRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
             body: JSON.stringify({
               model: "google/gemini-2.5-flash",
               messages: [
@@ -67,7 +67,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-proof")({
           try {
             const imgRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
               method: "POST",
-              headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
               body: JSON.stringify({
                 model: "google/gemini-2.5-flash-image",
                 messages: [{
