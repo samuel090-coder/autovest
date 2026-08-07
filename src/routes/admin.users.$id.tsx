@@ -63,7 +63,7 @@ function AdminUserDetail() {
           return true;
         }) as Array<{ ip: string; user_id: string }>;
       }
-      let inviter: { id: string; full_name: string | null; phone: string | null } | null = null;
+      let inviter: any = null;
       if (profile.data?.referred_by) {
         const { data: inv } = await supabase.from("profiles").select("id, full_name, phone").eq("id", profile.data.referred_by).maybeSingle();
         inviter = inv as never;
