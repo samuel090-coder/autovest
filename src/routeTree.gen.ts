@@ -33,6 +33,7 @@ import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments
 import { Route as AdminComplaintsRouteImport } from './routes/admin.complaints'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
+import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
 import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
@@ -156,6 +157,11 @@ const AdminAiCreateRoute = AdminAiCreateRouteImport.update({
   path: '/ai-create',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
 const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
   id: '/api/public/hooks/paystack',
   path: '/api/public/hooks/paystack',
@@ -189,10 +195,11 @@ export interface FileRoutesByFullPath {
   '/admin/investments': typeof AdminInvestmentsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/investment/$id': typeof InvestmentIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
@@ -216,10 +223,11 @@ export interface FileRoutesByTo {
   '/admin/investments': typeof AdminInvestmentsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/investment/$id': typeof InvestmentIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
@@ -245,10 +253,11 @@ export interface FileRoutesById {
   '/admin/investments': typeof AdminInvestmentsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/investment/$id': typeof InvestmentIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
 }
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/investment/$id'
     | '/payment/$id'
     | '/admin/'
+    | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
   fileRoutesByTo: FileRoutesByTo
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/investment/$id'
     | '/payment/$id'
     | '/admin'
+    | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
   id:
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/investment/$id'
     | '/payment/$id'
     | '/admin/'
+    | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
   fileRoutesById: FileRoutesById
@@ -529,6 +541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAiCreateRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users/$id': {
+      id: '/admin/users/$id'
+      path: '/$id'
+      fullPath: '/admin/users/$id'
+      preLoaderRoute: typeof AdminUsersIdRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
     '/api/public/hooks/paystack': {
       id: '/api/public/hooks/paystack'
       path: '/api/public/hooks/paystack'
@@ -546,6 +565,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminUsersRouteChildren {
+  AdminUsersIdRoute: typeof AdminUsersIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersIdRoute: AdminUsersIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminAiCreateRoute: typeof AdminAiCreateRoute
   AdminBannersRoute: typeof AdminBannersRoute
@@ -553,7 +584,7 @@ interface AdminRouteChildren {
   AdminInvestmentsRoute: typeof AdminInvestmentsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -564,7 +595,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminInvestmentsRoute: AdminInvestmentsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,
-  AdminUsersRoute: AdminUsersRoute,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -593,13 +624,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
