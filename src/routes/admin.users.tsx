@@ -52,19 +52,23 @@ function AdminUsers() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <tr><th className="py-2">User</th><th>Balance</th><th>Roles</th><th>Adjust balance</th></tr>
+            <tr><th className="py-2">User</th><th>Joined</th><th>Balance</th><th>Roles</th><th>Adjust balance</th><th></th></tr>
           </thead>
           <tbody className="divide-y">
             {filtered.map((u: any) => (
-              <tr key={u.id}>
+              <tr key={u.id} className="hover:bg-muted/50">
                 <td className="py-2">
-                  <div className="font-medium">{u.full_name || "—"}</div>
+                  <Link to="/admin/users/$id" params={{ id: u.id }} className="font-medium hover:underline">{u.full_name || "—"}</Link>
                   <div className="text-xs text-muted-foreground">{u.email} · {u.phone}</div>
                 </td>
+                <td className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
                 <td className="font-semibold">{formatNaira(u.wallets?.[0]?.balance ?? 0)}</td>
                 <td>{(u.user_roles ?? []).map((r: any) => r.role).join(", ") || "user"}</td>
                 <td>
                   <AdjustForm onSubmit={(delta) => adjust.mutate({ userId: u.id, delta })} />
+                </td>
+                <td>
+                  <Link to="/admin/users/$id" params={{ id: u.id }} className="whitespace-nowrap rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white">View full data</Link>
                 </td>
               </tr>
             ))}
