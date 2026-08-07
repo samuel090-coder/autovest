@@ -14,7 +14,15 @@ function AdminTx() {
   const qc = useQueryClient();
   const { data: txs = [] } = useQuery({
     queryKey: ["admin-tx"],
-    queryFn: async () => (await supabase.from("transactions").select("*, profile:profiles(full_name,email,phone)").order("created_at", { ascending: false }).limit(200)).data ?? [],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*, profile:profiles!transactions_user_id_profiles_fkey(id,full_name,email,phone)")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return data ?? [];
+    },
   });
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected" }) => {
