@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { formatNaira } from "@/lib/format";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 
-export const Route = createFileRoute("/admin/users/$id")({
+export const Route = createFileRoute("/admin/users_/$id")({
   component: AdminUserDetail,
 });
 
