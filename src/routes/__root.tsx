@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ActivityTracker } from "@/components/activity-tracker";
+import { WithdrawalAlerts } from "@/components/withdrawal-alerts";
 
 function NotFoundComponent() {
   return (
