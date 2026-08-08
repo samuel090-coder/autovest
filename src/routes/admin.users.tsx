@@ -18,14 +18,26 @@ function AdminUsers() {
   const { data: users = [] } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, email, phone, full_name, created_at, wallets(balance), user_roles(role)")
+        .select("id, email, phone, full_name, created_at")
         .order("created_at", { ascending: false })
         .limit(200);
-      return data ?? [];
+      const ids = (profiles ?? []).map((p) => p.id);
+      if (!ids.length) return [];
+      const [{ data: wallets }, { data: roles }] = await Promise.all([
+        supabase.from("wallets").select("user_id, balance, bonus_balance, total_withdrawals").in("user_id", ids),
+        supabase.from("user_roles").select("user_id, role").in("user_id", ids),
+      ]);
+      const wMap = new Map((wallets ?? []).map((w) => [w.user_id, w]));
+      return (profiles ?? []).map((p) => ({
+        ...p,
+        wallet: wMap.get(p.id) ?? null,
+        roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role),
+      }));
     },
   });
+
 
   const adjust = useMutation({
     mutationFn: async ({ userId, delta }: { userId: string; delta: number }) => {
