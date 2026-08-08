@@ -18,14 +18,26 @@ function AdminUsers() {
   const { data: users = [] } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, email, phone, full_name, created_at, wallets(balance), user_roles(role)")
+        .select("id, email, phone, full_name, created_at")
         .order("created_at", { ascending: false })
         .limit(200);
-      return data ?? [];
+      const ids = (profiles ?? []).map((p) => p.id);
+      if (!ids.length) return [];
+      const [{ data: wallets }, { data: roles }] = await Promise.all([
+        supabase.from("wallets").select("user_id, balance, bonus_balance, total_withdrawals").in("user_id", ids),
+        supabase.from("user_roles").select("user_id, role").in("user_id", ids),
+      ]);
+      const wMap = new Map((wallets ?? []).map((w) => [w.user_id, w]));
+      return (profiles ?? []).map((p) => ({
+        ...p,
+        wallet: wMap.get(p.id) ?? null,
+        roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role),
+      }));
     },
   });
+
 
   const adjust = useMutation({
     mutationFn: async ({ userId, delta }: { userId: string; delta: number }) => {
@@ -52,7 +64,7 @@ function AdminUsers() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <tr><th className="py-2">User</th><th>Joined</th><th>Balance</th><th>Roles</th><th>Adjust balance</th><th></th></tr>
+            <tr><th className="py-2">User</th><th>Joined</th><th>Balance</th><th>Reward</th><th>Withdrawn</th><th>Roles</th><th>Adjust balance</th><th></th></tr>
           </thead>
           <tbody className="divide-y">
             {filtered.map((u: any) => (
@@ -62,8 +74,11 @@ function AdminUsers() {
                   <div className="text-xs text-muted-foreground">{u.email} · {u.phone}</div>
                 </td>
                 <td className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
-                <td className="font-semibold">{formatNaira(u.wallets?.[0]?.balance ?? 0)}</td>
-                <td>{(u.user_roles ?? []).map((r: any) => r.role).join(", ") || "user"}</td>
+                <td className="font-semibold">{formatNaira(u.wallet?.balance ?? 0)}</td>
+                <td className="text-xs">{formatNaira(u.wallet?.bonus_balance ?? 0)}</td>
+                <td className="text-xs">{formatNaira(u.wallet?.total_withdrawals ?? 0)}</td>
+                <td>{(u.roles ?? []).join(", ") || "user"}</td>
+
                 <td>
                   <AdjustForm onSubmit={(delta) => adjust.mutate({ userId: u.id, delta })} />
                 </td>
