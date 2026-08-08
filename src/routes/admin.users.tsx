@@ -64,7 +64,7 @@ function AdminUsers() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <tr><th className="py-2">User</th><th>Joined</th><th>Balance</th><th>Roles</th><th>Adjust balance</th><th></th></tr>
+            <tr><th className="py-2">User</th><th>Joined</th><th>Balance</th><th>Reward</th><th>Withdrawn</th><th>Roles</th><th>Adjust balance</th><th></th></tr>
           </thead>
           <tbody className="divide-y">
             {filtered.map((u: any) => (
@@ -74,8 +74,11 @@ function AdminUsers() {
                   <div className="text-xs text-muted-foreground">{u.email} · {u.phone}</div>
                 </td>
                 <td className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
-                <td className="font-semibold">{formatNaira(u.wallets?.[0]?.balance ?? 0)}</td>
-                <td>{(u.user_roles ?? []).map((r: any) => r.role).join(", ") || "user"}</td>
+                <td className="font-semibold">{formatNaira(u.wallet?.balance ?? 0)}</td>
+                <td className="text-xs">{formatNaira(u.wallet?.bonus_balance ?? 0)}</td>
+                <td className="text-xs">{formatNaira(u.wallet?.total_withdrawals ?? 0)}</td>
+                <td>{(u.roles ?? []).join(", ") || "user"}</td>
+
                 <td>
                   <AdjustForm onSubmit={(delta) => adjust.mutate({ userId: u.id, delta })} />
                 </td>
