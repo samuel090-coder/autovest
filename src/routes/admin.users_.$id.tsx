@@ -133,6 +133,8 @@ function AdminUserDetail() {
 
   const withdrawals = txs.filter((t: any) => t.type === "withdraw");
   const lastSession = activity.find((a: any) => a.ip);
+  const lastDevice = activity.find((a: any) => a.device_id) as any;
+
   const bonusesClaimed: string[] = [];
   if (wallet?.welcome_bonus_claimed) bonusesClaimed.push("Welcome ₦500");
   if (txs.some((t: any) => t.type === "free_cash")) bonusesClaimed.push("Free cash code");
