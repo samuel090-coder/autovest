@@ -129,6 +129,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ActivityTracker />
       <WithdrawalAlerts />
+      <InstallReward />
+      <OfferBadge />
+      <InvestReminder />
+
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
