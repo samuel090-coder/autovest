@@ -33,18 +33,21 @@ function AdminUserDetail() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-user-detail", id],
     queryFn: async () => {
-      const [profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky] = await Promise.all([
+      const [profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky, ledger, installs, offerClaims] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase.from("wallets").select("*").eq("user_id", id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", id),
-        supabase.from("transactions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(100),
+        supabase.from("transactions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(200),
         supabase.from("user_investments").select("*, investments(name)").eq("user_id", id).order("purchased_at", { ascending: false }),
         supabase.from("profiles").select("id, full_name, phone, email, created_at").eq("referred_by", id).order("created_at", { ascending: false }),
-        supabase.from("user_activity").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(100),
+        supabase.from("user_activity").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(200),
         supabase.from("bank_accounts").select("*").eq("user_id", id),
         supabase.from("payment_complaints").select("*").eq("user_id", id).order("created_at", { ascending: false }),
         supabase.from("bonus_watches").select("id, reward_amount, watched_at").eq("user_id", id),
         supabase.from("lucky_draw_state").select("*").eq("user_id", id).maybeSingle(),
+        supabase.from("wallet_ledger").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(300),
+        supabase.from("app_installs").select("*").eq("user_id", id).maybeSingle(),
+        supabase.from("offer_claims").select("*").eq("user_id", id),
       ]);
       const ips = Array.from(new Set((activity.data ?? []).map((a) => a.ip).filter(Boolean))) as string[];
       let sharedIps: Array<{ ip: string; user_id: string }> = [];
@@ -63,6 +66,25 @@ function AdminUserDetail() {
           return true;
         }) as Array<{ ip: string; user_id: string }>;
       }
+
+      const deviceIds = Array.from(new Set((activity.data ?? []).map((a) => a.device_id).filter(Boolean))) as string[];
+      let sharedDevices: Array<{ device_id: string; user_id: string }> = [];
+      if (deviceIds.length) {
+        const { data: others } = await supabase
+          .from("user_activity")
+          .select("device_id, user_id")
+          .in("device_id", deviceIds)
+          .neq("user_id", id)
+          .limit(500);
+        const seen = new Set<string>();
+        sharedDevices = (others ?? []).filter((o) => {
+          const k = `${o.device_id}|${o.user_id}`;
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        }) as Array<{ device_id: string; user_id: string }>;
+      }
+
       let inviter: any = null;
       if (profile.data?.referred_by) {
         const { data: inv } = await supabase.from("profiles").select("id, full_name, phone").eq("id", profile.data.referred_by).maybeSingle();
@@ -80,11 +102,16 @@ function AdminUserDetail() {
         complaints: complaints.data ?? [],
         watches: watches.data ?? [],
         lucky: lucky.data,
+        ledger: ledger.data ?? [],
+        install: installs.data,
+        offerClaims: offerClaims.data ?? [],
         sharedIps,
+        sharedDevices,
         inviter,
       };
     },
   });
+
 
   if (isLoading) return <Card className="p-6 text-sm text-muted-foreground">Loading user…</Card>;
   if (!data?.profile) return <Card className="p-6 text-sm">User not found.</Card>;
