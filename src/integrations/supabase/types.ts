@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_installs: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          id: string
+          reward_amount: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          reward_amount?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          reward_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           account_number: string
@@ -369,6 +393,66 @@ export type Database = {
         }
         Relationships: []
       }
+      offer_claims: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          offer_key: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          offer_key: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          offer_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      offers: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          key: string
+          required_investment: number
+          reward_amount: number
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          required_investment: number
+          reward_amount: number
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          required_investment?: number
+          reward_amount?: number
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
       payment_complaints: {
         Row: {
           admin_note: string | null
@@ -572,42 +656,57 @@ export type Database = {
       }
       user_activity: {
         Row: {
+          browser: string | null
           city: string | null
           country: string | null
           created_at: string
+          device_id: string | null
+          device_model: string | null
           event: string
           id: string
           ip: string | null
+          is_pwa: boolean
           label: string | null
           meta: Json
+          os: string | null
           path: string | null
           region: string | null
           user_agent: string | null
           user_id: string
         }
         Insert: {
+          browser?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          device_id?: string | null
+          device_model?: string | null
           event?: string
           id?: string
           ip?: string | null
+          is_pwa?: boolean
           label?: string | null
           meta?: Json
+          os?: string | null
           path?: string | null
           region?: string | null
           user_agent?: string | null
           user_id: string
         }
         Update: {
+          browser?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          device_id?: string | null
+          device_model?: string | null
           event?: string
           id?: string
           ip?: string | null
+          is_pwa?: boolean
           label?: string | null
           meta?: Json
+          os?: string | null
           path?: string | null
           region?: string | null
           user_agent?: string | null
@@ -706,6 +805,42 @@ export type Database = {
           },
         ]
       }
+      wallet_ledger: {
+        Row: {
+          actor: string | null
+          created_at: string
+          delta: number
+          field: string
+          id: string
+          new_value: number
+          old_value: number
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          delta?: number
+          field: string
+          id?: string
+          new_value?: number
+          old_value?: number
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          delta?: number
+          field?: string
+          id?: string
+          new_value?: number
+          old_value?: number
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallets: {
         Row: {
           balance: number
@@ -788,7 +923,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_install_bonus: { Args: { _device_id?: string }; Returns: Json }
       claim_investment: { Args: { _uinv_id: string }; Returns: Json }
+      claim_offer: { Args: { _key: string }; Returns: Json }
       claim_welcome_bonus: { Args: never; Returns: Json }
       complete_bonus_watch: { Args: { _video_id: string }; Returns: Json }
       has_role: {

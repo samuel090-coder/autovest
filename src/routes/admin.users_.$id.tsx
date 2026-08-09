@@ -33,18 +33,21 @@ function AdminUserDetail() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-user-detail", id],
     queryFn: async () => {
-      const [profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky] = await Promise.all([
+      const [profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky, ledger, installs, offerClaims] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase.from("wallets").select("*").eq("user_id", id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", id),
-        supabase.from("transactions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(100),
+        supabase.from("transactions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(200),
         supabase.from("user_investments").select("*, investments(name)").eq("user_id", id).order("purchased_at", { ascending: false }),
         supabase.from("profiles").select("id, full_name, phone, email, created_at").eq("referred_by", id).order("created_at", { ascending: false }),
-        supabase.from("user_activity").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(100),
+        supabase.from("user_activity").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(200),
         supabase.from("bank_accounts").select("*").eq("user_id", id),
         supabase.from("payment_complaints").select("*").eq("user_id", id).order("created_at", { ascending: false }),
         supabase.from("bonus_watches").select("id, reward_amount, watched_at").eq("user_id", id),
         supabase.from("lucky_draw_state").select("*").eq("user_id", id).maybeSingle(),
+        supabase.from("wallet_ledger").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(300),
+        supabase.from("app_installs").select("*").eq("user_id", id).maybeSingle(),
+        supabase.from("offer_claims").select("*").eq("user_id", id),
       ]);
       const ips = Array.from(new Set((activity.data ?? []).map((a) => a.ip).filter(Boolean))) as string[];
       let sharedIps: Array<{ ip: string; user_id: string }> = [];
@@ -63,6 +66,25 @@ function AdminUserDetail() {
           return true;
         }) as Array<{ ip: string; user_id: string }>;
       }
+
+      const deviceIds = Array.from(new Set((activity.data ?? []).map((a) => a.device_id).filter(Boolean))) as string[];
+      let sharedDevices: Array<{ device_id: string; user_id: string }> = [];
+      if (deviceIds.length) {
+        const { data: others } = await supabase
+          .from("user_activity")
+          .select("device_id, user_id")
+          .in("device_id", deviceIds)
+          .neq("user_id", id)
+          .limit(500);
+        const seen = new Set<string>();
+        sharedDevices = (others ?? []).filter((o) => {
+          const k = `${o.device_id}|${o.user_id}`;
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        }) as Array<{ device_id: string; user_id: string }>;
+      }
+
       let inviter: any = null;
       if (profile.data?.referred_by) {
         const { data: inv } = await supabase.from("profiles").select("id, full_name, phone").eq("id", profile.data.referred_by).maybeSingle();
@@ -80,22 +102,39 @@ function AdminUserDetail() {
         complaints: complaints.data ?? [],
         watches: watches.data ?? [],
         lucky: lucky.data,
+        ledger: ledger.data ?? [],
+        install: installs.data,
+        offerClaims: offerClaims.data ?? [],
         sharedIps,
+        sharedDevices,
         inviter,
       };
     },
   });
 
+
   if (isLoading) return <Card className="p-6 text-sm text-muted-foreground">Loading user…</Card>;
   if (!data?.profile) return <Card className="p-6 text-sm">User not found.</Card>;
 
-  const { profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky, sharedIps, inviter } = data;
+  const { profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky, ledger, install, offerClaims, sharedIps, sharedDevices, inviter } = data;
+
+  const reasonLabel = (r: string | null) => {
+    const map: Record<string, string> = {
+      app_install_bonus: "App install reward (₦100)",
+      unspecified: "Direct / unlabelled change",
+    };
+    if (r?.startsWith("offer_")) return `Earn-more offer (${r.replace("offer_", "")})`;
+    return map[r ?? "unspecified"] ?? r!.replace(/_/g, " ");
+  };
+
 
   const sum = (type: string, status?: string) =>
     txs.filter((t: any) => t.type === type && (!status || t.status === status)).reduce((a: number, t: any) => a + Number(t.amount), 0);
 
   const withdrawals = txs.filter((t: any) => t.type === "withdraw");
   const lastSession = activity.find((a: any) => a.ip);
+  const lastDevice = activity.find((a: any) => a.device_id) as any;
+
   const bonusesClaimed: string[] = [];
   if (wallet?.welcome_bonus_claimed) bonusesClaimed.push("Welcome ₦500");
   if (txs.some((t: any) => t.type === "free_cash")) bonusesClaimed.push("Free cash code");
@@ -153,6 +192,57 @@ function AdminUserDetail() {
         </Card>
       )}
 
+      {sharedDevices.length > 0 && (
+        <Card className="border-destructive/50 bg-destructive/5 p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-destructive">
+            <AlertTriangle className="h-4 w-4" /> Same device as {new Set(sharedDevices.map((s) => s.user_id)).size} other account(s) — likely multi-accounting
+          </div>
+          <ul className="mt-2 space-y-1 text-xs">
+            {sharedDevices.slice(0, 20).map((s, i) => (
+              <li key={i}>
+                <span className="font-mono">{s.device_id}</span> →{" "}
+                <Link to="/admin/users/$id" params={{ id: s.user_id }} className="text-brand underline">{s.user_id}</Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      <Card className="p-4">
+        <h3 className="mb-1 text-sm font-semibold">Money trail — every balance change ({ledger.length})</h3>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Each row is an automatic audit record: what changed, from what to what, why, and who triggered it.
+        </p>
+        {ledger.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No changes recorded yet — auditing starts from now, so any future credit to this account will be traced here.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-xs uppercase text-muted-foreground">
+                <tr><th className="py-1">When</th><th>Field</th><th>Change</th><th>From → To</th><th>Reason</th><th>Actor</th></tr>
+              </thead>
+              <tbody className="divide-y">
+                {ledger.map((l: any) => (
+                  <tr key={l.id}>
+                    <td className="whitespace-nowrap py-1.5 text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
+                    <td className="text-xs capitalize">{String(l.field).replace(/_/g, " ")}</td>
+                    <td className={`font-semibold ${Number(l.delta) >= 0 ? "text-success" : "text-destructive"}`}>
+                      {Number(l.delta) >= 0 ? "+" : ""}{formatNaira(l.delta)}
+                    </td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{formatNaira(l.old_value)} → {formatNaira(l.new_value)}</td>
+                    <td className="text-xs">{reasonLabel(l.reason)}</td>
+                    <td className="font-mono text-[10px] text-muted-foreground">{l.actor === profile.id ? "self" : l.actor}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-4">
           <h3 className="mb-2 text-sm font-semibold">Account & identity</h3>
@@ -167,7 +257,14 @@ function AdminUserDetail() {
           />
           <Row label="Last IP" value={<span className="font-mono text-xs">{lastSession?.ip ?? "not captured yet"}</span>} />
           <Row label="Location" value={[lastSession?.city, lastSession?.region, lastSession?.country].filter(Boolean).join(", ") || "—"} />
-          <Row label="Device / browser" value={<span className="text-xs">{lastSession?.user_agent ?? "—"}</span>} />
+          <Row label="Device" value={[lastDevice?.device_model, lastDevice?.os].filter(Boolean).join(" · ") || "—"} />
+          <Row label="Browser" value={lastDevice?.browser ?? "—"} />
+          <Row label="Device ID" value={<span className="font-mono text-xs">{lastDevice?.device_id ?? "not captured yet"}</span>} />
+          <Row label="Devices used" value={String(new Set(activity.map((a: any) => a.device_id).filter(Boolean)).size)} />
+          <Row label="Installed app" value={install ? `Yes · ₦${Number(install.reward_amount)} credited ${new Date(install.created_at).toLocaleDateString()}` : "No"} />
+          <Row label="Offers claimed" value={offerClaims.length ? offerClaims.map((o: any) => `${o.offer_key} (${formatNaira(o.amount)})`).join(", ") : "None"} />
+          <Row label="User agent" value={<span className="text-xs">{lastSession?.user_agent ?? "—"}</span>} />
+
         </Card>
 
         <Card className="p-4">

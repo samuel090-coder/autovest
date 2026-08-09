@@ -17,6 +17,7 @@ import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as MessageRouteImport } from './routes/message'
 import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
 import { Route as FreeCashRouteImport } from './routes/free-cash'
+import { Route as EarnMoreRouteImport } from './routes/earn-more'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CertificationRouteImport } from './routes/certification'
 import { Route as BonusTaskRouteImport } from './routes/bonus-task'
@@ -75,6 +76,11 @@ const LuckyDrawRoute = LuckyDrawRouteImport.update({
 const FreeCashRoute = FreeCashRouteImport.update({
   id: '/free-cash',
   path: '/free-cash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnMoreRoute = EarnMoreRouteImport.update({
+  id: '/earn-more',
+  path: '/earn-more',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/bonus-task': typeof BonusTaskRoute
   '/certification': typeof CertificationRoute
   '/chat': typeof ChatRoute
+  '/earn-more': typeof EarnMoreRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/bonus-task': typeof BonusTaskRoute
   '/certification': typeof CertificationRoute
   '/chat': typeof ChatRoute
+  '/earn-more': typeof EarnMoreRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/bonus-task': typeof BonusTaskRoute
   '/certification': typeof CertificationRoute
   '/chat': typeof ChatRoute
+  '/earn-more': typeof EarnMoreRoute
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/bonus-task'
     | '/certification'
     | '/chat'
+    | '/earn-more'
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/bonus-task'
     | '/certification'
     | '/chat'
+    | '/earn-more'
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/bonus-task'
     | '/certification'
     | '/chat'
+    | '/earn-more'
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
@@ -357,6 +369,7 @@ export interface RootRouteChildren {
   BonusTaskRoute: typeof BonusTaskRoute
   CertificationRoute: typeof CertificationRoute
   ChatRoute: typeof ChatRoute
+  EarnMoreRoute: typeof EarnMoreRoute
   FreeCashRoute: typeof FreeCashRoute
   LuckyDrawRoute: typeof LuckyDrawRoute
   MessageRoute: typeof MessageRoute
@@ -427,6 +440,13 @@ declare module '@tanstack/react-router' {
       path: '/free-cash'
       fullPath: '/free-cash'
       preLoaderRoute: typeof FreeCashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-more': {
+      id: '/earn-more'
+      path: '/earn-more'
+      fullPath: '/earn-more'
+      preLoaderRoute: typeof EarnMoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -598,6 +618,7 @@ const rootRouteChildren: RootRouteChildren = {
   BonusTaskRoute: BonusTaskRoute,
   CertificationRoute: CertificationRoute,
   ChatRoute: ChatRoute,
+  EarnMoreRoute: EarnMoreRoute,
   FreeCashRoute: FreeCashRoute,
   LuckyDrawRoute: LuckyDrawRoute,
   MessageRoute: MessageRoute,

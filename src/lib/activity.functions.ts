@@ -8,6 +8,11 @@ type ActivityInput = {
   label?: string;
   meta?: Record<string, unknown>;
   geo?: boolean;
+  device_id?: string;
+  device_model?: string;
+  browser?: string;
+  os?: string;
+  is_pwa?: boolean;
 };
 
 function clientIp(req: Request): string | null {
@@ -50,6 +55,11 @@ export const logActivity = createServerFn({ method: "POST" })
       country: geo.country ?? null,
       region: geo.region ?? null,
       city: geo.city ?? null,
+      device_id: data.device_id ?? null,
+      device_model: data.device_model ?? null,
+      browser: data.browser ?? null,
+      os: data.os ?? null,
+      is_pwa: data.is_pwa ?? false,
     });
     if (error) return { ok: false, error: error.message };
     return { ok: true };
