@@ -190,6 +190,57 @@ function AdminUserDetail() {
         </Card>
       )}
 
+      {sharedDevices.length > 0 && (
+        <Card className="border-destructive/50 bg-destructive/5 p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-destructive">
+            <AlertTriangle className="h-4 w-4" /> Same device as {new Set(sharedDevices.map((s) => s.user_id)).size} other account(s) — likely multi-accounting
+          </div>
+          <ul className="mt-2 space-y-1 text-xs">
+            {sharedDevices.slice(0, 20).map((s, i) => (
+              <li key={i}>
+                <span className="font-mono">{s.device_id}</span> →{" "}
+                <Link to="/admin/users/$id" params={{ id: s.user_id }} className="text-brand underline">{s.user_id}</Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      <Card className="p-4">
+        <h3 className="mb-1 text-sm font-semibold">Money trail — every balance change ({ledger.length})</h3>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Each row is an automatic audit record: what changed, from what to what, why, and who triggered it.
+        </p>
+        {ledger.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No changes recorded yet — auditing starts from now, so any future credit to this account will be traced here.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-xs uppercase text-muted-foreground">
+                <tr><th className="py-1">When</th><th>Field</th><th>Change</th><th>From → To</th><th>Reason</th><th>Actor</th></tr>
+              </thead>
+              <tbody className="divide-y">
+                {ledger.map((l: any) => (
+                  <tr key={l.id}>
+                    <td className="whitespace-nowrap py-1.5 text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
+                    <td className="text-xs capitalize">{String(l.field).replace(/_/g, " ")}</td>
+                    <td className={`font-semibold ${Number(l.delta) >= 0 ? "text-success" : "text-destructive"}`}>
+                      {Number(l.delta) >= 0 ? "+" : ""}{formatNaira(l.delta)}
+                    </td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{formatNaira(l.old_value)} → {formatNaira(l.new_value)}</td>
+                    <td className="text-xs">{reasonLabel(l.reason)}</td>
+                    <td className="font-mono text-[10px] text-muted-foreground">{l.actor === profile.id ? "self" : l.actor}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-4">
           <h3 className="mb-2 text-sm font-semibold">Account & identity</h3>
