@@ -116,7 +116,17 @@ function AdminUserDetail() {
   if (isLoading) return <Card className="p-6 text-sm text-muted-foreground">Loading user…</Card>;
   if (!data?.profile) return <Card className="p-6 text-sm">User not found.</Card>;
 
-  const { profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky, sharedIps, inviter } = data;
+  const { profile, wallet, roles, txs, invs, referrals, activity, banks, complaints, watches, lucky, ledger, install, offerClaims, sharedIps, sharedDevices, inviter } = data;
+
+  const reasonLabel = (r: string | null) => {
+    const map: Record<string, string> = {
+      app_install_bonus: "App install reward (₦100)",
+      unspecified: "Direct / unlabelled change",
+    };
+    if (r?.startsWith("offer_")) return `Earn-more offer (${r.replace("offer_", "")})`;
+    return map[r ?? "unspecified"] ?? r!.replace(/_/g, " ");
+  };
+
 
   const sum = (type: string, status?: string) =>
     txs.filter((t: any) => t.type === type && (!status || t.status === status)).reduce((a: number, t: any) => a + Number(t.amount), 0);
