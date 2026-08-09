@@ -13,6 +13,9 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ActivityTracker } from "@/components/activity-tracker";
 import { WithdrawalAlerts } from "@/components/withdrawal-alerts";
+import { InstallReward } from "@/components/install-reward";
+import { OfferBadge } from "@/components/offer-badge";
+import { InvestReminder } from "@/components/invest-reminder";
 
 function NotFoundComponent() {
   return (
