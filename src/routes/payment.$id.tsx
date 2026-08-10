@@ -29,6 +29,7 @@ type BankCfg = {
   account_name?: string;
   telegram_username?: string;
   telegram_message?: string;
+  support_email?: string;
   note?: string;
 };
 
@@ -69,13 +70,8 @@ function PaymentPage() {
   const reference = `INV-${id.slice(0, 8).toUpperCase()}`;
   const status = tx?.status ?? "pending";
 
-  const tgUser = (cfg?.telegram_username ?? "").replace(/^@/, "").trim();
-  const tgText = encodeURIComponent(
-    (cfg?.telegram_message ??
-      "Hello Support 👋, I have made a payment on InvestPro and I need my payment token.") +
-      `\n\nAmount: ₦${amount.toLocaleString()}\nReference: ${reference}`,
-  );
-  const tgLink = tgUser ? `https://t.me/${tgUser}?text=${tgText}` : "";
+  const supportEmail = (cfg?.support_email ?? "cartswiftonline@gmail.com").trim();
+const emailLink = `mailto:${supportEmail}?subject=Payment%20Token%20-%20${reference}&body=${tgText}`;
 
   async function submitToken() {
     const t = token.trim();
@@ -197,26 +193,21 @@ function PaymentPage() {
               </div>
 
               <div className="px-4 pt-4">
-                <div className="rounded-2xl bg-white p-4 shadow-sm">
-                  <div className="flex items-center gap-2 text-base font-bold">
-                    <Send className="h-5 w-5 text-sky-500" /> Step 2 — Get your payment token
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Chat with our support team on Telegram to receive your payment token.
-                  </p>
-                  <Button
-                    asChild={!!tgLink}
-                    disabled={!tgLink}
-                    className="mt-3 h-12 w-full rounded-full bg-sky-500 text-sm font-semibold text-white hover:bg-sky-600"
-                  >
-                    {tgLink ? (
-                      <a href={tgLink} target="_blank" rel="noreferrer"><Send className="mr-2 h-4 w-4" /> Chat with support on Telegram</a>
-                    ) : (
-                      <span>Telegram support unavailable</span>
-                    )}
-                  </Button>
-                </div>
-              </div>
+  <div className="rounded-2xl bg-white p-4 shadow-sm">
+    <div className="flex items-center gap-2 text-base font-bold">
+      <Send className="h-5 w-5 text-sky-500" /> Step 2 — Get your payment token
+    </div>
+    <p className="mt-1 text-sm text-muted-foreground">
+      Email our support team to receive your payment token.
+    </p>
+    <Button
+      asChild
+      className="mt-3 h-12 w-full rounded-full bg-sky-500 text-sm font-semibold text-white hover:bg-sky-600"
+    >
+      <a href__={emailLink}><Send className="mr-2 h-4 w-4" /> Email support</a>
+    </Button>
+  </div>
+</div>
 
               <div className="px-4 pt-4">
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
