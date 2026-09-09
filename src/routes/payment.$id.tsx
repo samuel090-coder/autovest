@@ -71,7 +71,10 @@ function PaymentPage() {
   const status = tx?.status ?? "pending";
 
   const supportEmail = (cfg?.support_email ?? "cartswiftonline@gmail.com").trim();
-const emailLink = `mailto:${supportEmail}?subject=Payment%20Token%20-%20${reference}&body=${tgText}`;
+  const emailBody = encodeURIComponent(
+    `Hello Support,\n\nI have made a payment of NGN ${amount.toLocaleString()}.\nReference: ${reference}\n\nPlease send me my payment token.`,
+  );
+  const emailLink = `mailto:${supportEmail}?subject=Payment%20Token%20-%20${reference}&body=${emailBody}`;
 
   async function submitToken() {
     const t = token.trim();
@@ -204,7 +207,7 @@ const emailLink = `mailto:${supportEmail}?subject=Payment%20Token%20-%20${refere
       asChild
       className="mt-3 h-12 w-full rounded-full bg-sky-500 text-sm font-semibold text-white hover:bg-sky-600"
     >
-      <a href__={emailLink}><Send className="mr-2 h-4 w-4" /> Email support</a>
+      <a href={emailLink}><Send className="mr-2 h-4 w-4" /> Email support</a>
     </Button>
   </div>
 </div>
