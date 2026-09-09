@@ -16,6 +16,7 @@ import { WithdrawalAlerts } from "@/components/withdrawal-alerts";
 import { InstallReward } from "@/components/install-reward";
 import { OfferBadge } from "@/components/offer-badge";
 import { InvestReminder } from "@/components/invest-reminder";
+import { PwaInstallModal } from "@/components/pwa-install-modal";
 
 function NotFoundComponent() {
   return (
@@ -94,12 +95,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Track your balance, browse welfare products and grow your daily income." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OjxhPBBGcgbt5jzZBtU5uh9tOYv1/social-images/social-1783112590196-1002907305.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OjxhPBBGcgbt5jzZBtU5uh9tOYv1/social-images/social-1783112590196-1002907305.webp" },
+      { name: "theme-color", content: "#dc2626" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "AutoVest" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -125,6 +130,20 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+    const host = window.location.hostname;
+    const isPreview = import.meta.env.DEV || host.includes("id-preview") || host.includes("localhost");
+    if (isPreview) {
+      // Never keep a worker alive in preview/dev — it would serve stale builds.
+      void navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => void r.unregister()));
+      return;
+    }
+    const onLoad = () => void navigator.serviceWorker.register("/sw.js").catch(() => {});
+    if (document.readyState === "complete") onLoad();
+    else window.addEventListener("load", onLoad, { once: true });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ActivityTracker />
@@ -132,6 +151,7 @@ function RootComponent() {
       <InstallReward />
       <OfferBadge />
       <InvestReminder />
+      <PwaInstallModal />
 
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />

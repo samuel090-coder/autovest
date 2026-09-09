@@ -1,13 +1,17 @@
 {
-  "name": "InvestPro — Earn Daily",
-  "short_name": "InvestPro",
+  "name": "AutoVest — Earn Daily",
+  "short_name": "AutoVest",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#dc2626",
   "theme_color": "#dc2626",
-  "description": "InvestPro helps you grow your money with daily investment plans, referral bonuses, lucky draws and instant withdrawals.",
+  "description": "AutoVest helps you grow your money with daily investment plans, referral bonuses, lucky draws and instant withdrawals.",
   "icons": [
     { "src": "/favicon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
