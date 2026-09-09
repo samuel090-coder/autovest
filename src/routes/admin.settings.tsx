@@ -12,6 +12,71 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { uploadAndGetUrl } from "@/lib/storage";
+import { PwaInstallCard, mergePwaConfig, type PwaInstallConfig } from "@/components/pwa-install-modal";
+
+function PwaInstallEditor() {
+  const { data, save } = useSetting("pwa_install");
+  const [cfg, setCfg] = useState<PwaInstallConfig>(mergePwaConfig(null));
+  const [uploading, setUploading] = useState(false);
+  useEffect(() => { if (data) setCfg(mergePwaConfig(data)); }, [data]);
+  const set = <K extends keyof PwaInstallConfig>(k: K, v: PwaInstallConfig[K]) => setCfg((c) => ({ ...c, [k]: v }));
+
+  async function onFile(f: File | undefined) {
+    if (!f) return;
+    setUploading(true);
+    try { set("image_url", await uploadAndGetUrl("banners", f)); toast.success("Image uploaded"); }
+    catch (e: any) { toast.error(e.message); }
+    finally { setUploading(false); }
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <Card className="space-y-3 p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">App install popup</h3>
+          <Switch checked={cfg.enabled} onCheckedChange={(v) => set("enabled", v)} />
+        </div>
+        <div>
+          <Label className="text-xs">Banner image</Label>
+          <Input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0])} />
+          {cfg.image_url ? (
+            <div className="mt-2 flex items-center gap-2">
+              <img src={cfg.image_url} alt="Install banner" className="h-14 w-24 rounded object-cover" />
+              <Button size="sm" variant="ghost" onClick={() => set("image_url", "")}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          ) : null}
+          {uploading ? <p className="mt-1 text-xs text-muted-foreground">Uploading…</p> : null}
+        </div>
+        <div><Label className="text-xs">Title</Label><Input value={cfg.title} onChange={(e) => set("title", e.target.value)} /></div>
+        <div><Label className="text-xs">Description</Label><Textarea rows={4} value={cfg.description} onChange={(e) => set("description", e.target.value)} /></div>
+        <div className="grid grid-cols-2 gap-2">
+          <div><Label className="text-xs">Install button text</Label><Input value={cfg.install_label} onChange={(e) => set("install_label", e.target.value)} /></div>
+          <div><Label className="text-xs">Secondary button text</Label><Input value={cfg.secondary_label} onChange={(e) => set("secondary_label", e.target.value)} /></div>
+        </div>
+        <div className="flex items-center justify-between"><Label className="text-xs">Show secondary button</Label><Switch checked={cfg.secondary_enabled} onCheckedChange={(v) => set("secondary_enabled", v)} /></div>
+        <div className="flex items-center justify-between"><Label className="text-xs">Animations</Label><Switch checked={cfg.animate} onCheckedChange={(v) => set("animate", v)} /></div>
+        <div className="grid grid-cols-3 gap-2">
+          <div><Label className="text-xs">Gradient from</Label><Input type="color" value={cfg.color_from} onChange={(e) => set("color_from", e.target.value)} /></div>
+          <div><Label className="text-xs">Gradient to</Label><Input type="color" value={cfg.color_to} onChange={(e) => set("color_to", e.target.value)} /></div>
+          <div><Label className="text-xs">Button</Label><Input type="color" value={cfg.button_color} onChange={(e) => set("button_color", e.target.value)} /></div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div><Label className="text-xs">Remind after (min)</Label><Input type="number" min={1} value={cfg.remind_after_min} onChange={(e) => set("remind_after_min", Number(e.target.value))} /></div>
+          <div><Label className="text-xs">Start (optional)</Label><Input type="datetime-local" value={cfg.start_at} onChange={(e) => set("start_at", e.target.value)} /></div>
+          <div><Label className="text-xs">End (optional)</Label><Input type="datetime-local" value={cfg.end_at} onChange={(e) => set("end_at", e.target.value)} /></div>
+        </div>
+        <Button onClick={() => save.mutate(cfg)} disabled={save.isPending}>{save.isPending ? "Saving…" : "Publish install popup"}</Button>
+      </Card>
+
+      <Card className="space-y-3 p-4">
+        <h3 className="font-semibold">Live preview</h3>
+        <div className="flex justify-center rounded-2xl bg-black/60 p-4">
+          <PwaInstallCard cfg={cfg} onInstall={() => toast.info("Preview only")} onDismiss={() => toast.info("Preview only")} />
+        </div>
+      </Card>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
@@ -30,6 +95,7 @@ function AdminSettings() {
           <TabsTrigger value="freecash">Free cash</TabsTrigger>
           <TabsTrigger value="bonus">Bonus</TabsTrigger>
           <TabsTrigger value="proofs">Proofs</TabsTrigger>
+          <TabsTrigger value="install">Install app</TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value="popups" className="space-y-4"><Announce1 /><Announce2 /></TabsContent>
@@ -40,6 +106,7 @@ function AdminSettings() {
       <TabsContent value="freecash"><FreeCashAdmin /></TabsContent>
       <TabsContent value="bonus"><CashBenefitsEditor /></TabsContent>
       <TabsContent value="proofs"><ProofsAdmin /></TabsContent>
+      <TabsContent value="install"><PwaInstallEditor /></TabsContent>
     </Tabs>
 
   );
