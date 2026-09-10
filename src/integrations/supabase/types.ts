@@ -1079,6 +1079,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_send_broadcast: { Args: { _id: string }; Returns: Json }
+      audience_user_ids: {
+        Args: { _audience: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
       claim_install_bonus: { Args: { _device_id?: string }; Returns: Json }
       claim_investment: { Args: { _uinv_id: string }; Returns: Json }
       claim_offer: { Args: { _key: string }; Returns: Json }
@@ -1096,6 +1103,7 @@ export type Database = {
       lucky_spin: { Args: never; Returns: Json }
       lucky_sync_referrals: { Args: never; Returns: Json }
       mark_notifications_read: { Args: { _ids?: string[] }; Returns: number }
+      notifications_hourly_maintenance: { Args: never; Returns: undefined }
       notify_user: {
         Args: {
           _body: string
@@ -1114,6 +1122,7 @@ export type Database = {
         Args: { _token: string; _tx_id: string }
         Returns: Json
       }
+      run_scheduled_broadcasts: { Args: never; Returns: number }
       start_next_round: { Args: { _uinv_id: string }; Returns: Json }
       withdraw_bonus: {
         Args: { _amount: number; _bank_account_id: string }
