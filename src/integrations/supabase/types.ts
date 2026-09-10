@@ -393,6 +393,117 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_broadcasts: {
+        Row: {
+          action_label: string | null
+          audience: string
+          body: string
+          created_at: string
+          created_by: string | null
+          delivered: number
+          failed: number
+          id: string
+          image_url: string | null
+          recipients: number
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          title: string
+          url: string | null
+        }
+        Insert: {
+          action_label?: string | null
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          delivered?: number
+          failed?: number
+          id?: string
+          image_url?: string | null
+          recipients?: number
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          title: string
+          url?: string | null
+        }
+        Update: {
+          action_label?: string | null
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          delivered?: number
+          failed?: number
+          id?: string
+          image_url?: string | null
+          recipients?: number
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          broadcast_id: string | null
+          category: string
+          created_at: string
+          data: Json
+          dedupe_key: string | null
+          icon_url: string | null
+          id: string
+          image_url: string | null
+          push_attempts: number
+          push_state: string
+          pushed_at: string | null
+          read_at: string | null
+          title: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          broadcast_id?: string | null
+          category?: string
+          created_at?: string
+          data?: Json
+          dedupe_key?: string | null
+          icon_url?: string | null
+          id?: string
+          image_url?: string | null
+          push_attempts?: number
+          push_state?: string
+          pushed_at?: string | null
+          read_at?: string | null
+          title: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string
+          broadcast_id?: string | null
+          category?: string
+          created_at?: string
+          data?: Json
+          dedupe_key?: string | null
+          icon_url?: string | null
+          id?: string
+          image_url?: string | null
+          push_attempts?: number
+          push_state?: string
+          pushed_at?: string | null
+          read_at?: string | null
+          title?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       offer_claims: {
         Row: {
           amount: number
@@ -557,6 +668,51 @@ export type Database = {
           phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          device_id: string | null
+          disabled_at: string | null
+          endpoint: string
+          failure_count: number
+          id: string
+          is_pwa: boolean
+          last_seen_at: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          device_id?: string | null
+          disabled_at?: string | null
+          endpoint: string
+          failure_count?: number
+          id?: string
+          is_pwa?: boolean
+          last_seen_at?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          device_id?: string | null
+          disabled_at?: string | null
+          endpoint?: string
+          failure_count?: number
+          id?: string
+          is_pwa?: boolean
+          last_seen_at?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -923,6 +1079,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_send_broadcast: { Args: { _id: string }; Returns: Json }
+      audience_user_ids: {
+        Args: { _audience: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
       claim_install_bonus: { Args: { _device_id?: string }; Returns: Json }
       claim_investment: { Args: { _uinv_id: string }; Returns: Json }
       claim_offer: { Args: { _key: string }; Returns: Json }
@@ -939,11 +1102,27 @@ export type Database = {
       lucky_claim: { Args: never; Returns: Json }
       lucky_spin: { Args: never; Returns: Json }
       lucky_sync_referrals: { Args: never; Returns: Json }
+      mark_notifications_read: { Args: { _ids?: string[] }; Returns: number }
+      notifications_hourly_maintenance: { Args: never; Returns: undefined }
+      notify_user: {
+        Args: {
+          _body: string
+          _category: string
+          _data?: Json
+          _dedupe_key?: string
+          _image_url?: string
+          _title: string
+          _url?: string
+          _user_id: string
+        }
+        Returns: string
+      }
       redeem_free_cash: { Args: { _code: string }; Returns: Json }
       redeem_payment_token: {
         Args: { _token: string; _tx_id: string }
         Returns: Json
       }
+      run_scheduled_broadcasts: { Args: never; Returns: number }
       start_next_round: { Args: { _uinv_id: string }; Returns: Json }
       withdraw_bonus: {
         Args: { _amount: number; _bank_account_id: string }
