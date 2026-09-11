@@ -14,6 +14,7 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MessageRouteImport } from './routes/message'
 import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
 import { Route as FreeCashRouteImport } from './routes/free-cash'
@@ -30,6 +31,7 @@ import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
 import { Route as AdminComplaintsRouteImport } from './routes/admin.complaints'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
@@ -62,6 +64,11 @@ const RechargeRoute = RechargeRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessageRoute = MessageRouteImport.update({
@@ -144,6 +151,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInvestmentsRoute = AdminInvestmentsRouteImport.update({
   id: '/investments',
   path: '/investments',
@@ -198,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -207,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/complaints': typeof AdminComplaintsRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -228,6 +242,7 @@ export interface FileRoutesByTo {
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -237,6 +252,7 @@ export interface FileRoutesByTo {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/complaints': typeof AdminComplaintsRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -260,6 +276,7 @@ export interface FileRoutesById {
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -269,6 +286,7 @@ export interface FileRoutesById {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/complaints': typeof AdminComplaintsRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -293,6 +311,7 @@ export interface FileRouteTypes {
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
+    | '/notifications'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -302,6 +321,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/complaints'
     | '/admin/investments'
+    | '/admin/notifications'
     | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
@@ -323,6 +343,7 @@ export interface FileRouteTypes {
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
+    | '/notifications'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -332,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/complaints'
     | '/admin/investments'
+    | '/admin/notifications'
     | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
@@ -354,6 +376,7 @@ export interface FileRouteTypes {
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
+    | '/notifications'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -363,6 +386,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/complaints'
     | '/admin/investments'
+    | '/admin/notifications'
     | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
@@ -386,6 +410,7 @@ export interface RootRouteChildren {
   FreeCashRoute: typeof FreeCashRoute
   LuckyDrawRoute: typeof LuckyDrawRoute
   MessageRoute: typeof MessageRoute
+  NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
   RechargeRoute: typeof RechargeRoute
   TeamRoute: typeof TeamRoute
@@ -433,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/message': {
@@ -547,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/investments': {
       id: '/admin/investments'
       path: '/investments'
@@ -611,6 +650,7 @@ interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
   AdminComplaintsRoute: typeof AdminComplaintsRoute
   AdminInvestmentsRoute: typeof AdminInvestmentsRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -623,6 +663,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
   AdminComplaintsRoute: AdminComplaintsRoute,
   AdminInvestmentsRoute: AdminInvestmentsRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -643,6 +684,7 @@ const rootRouteChildren: RootRouteChildren = {
   FreeCashRoute: FreeCashRoute,
   LuckyDrawRoute: LuckyDrawRoute,
   MessageRoute: MessageRoute,
+  NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,
   RechargeRoute: RechargeRoute,
   TeamRoute: TeamRoute,
