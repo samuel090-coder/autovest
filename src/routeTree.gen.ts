@@ -35,6 +35,7 @@ import { Route as AdminComplaintsRouteImport } from './routes/admin.complaints'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users_.$id'
+import { Route as ApiPublicHooksPushDispatchRouteImport } from './routes/api/public/hooks/push-dispatch'
 import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
 import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
@@ -168,6 +169,12 @@ const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
   path: '/users/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicHooksPushDispatchRoute =
+  ApiPublicHooksPushDispatchRouteImport.update({
+    id: '/api/public/hooks/push-dispatch',
+    path: '/api/public/hooks/push-dispatch',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
   id: '/api/public/hooks/paystack',
   path: '/api/public/hooks/paystack',
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
+  '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -238,6 +246,7 @@ export interface FileRoutesByTo {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
+  '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -269,6 +278,7 @@ export interface FileRoutesById {
   '/admin/users_/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
+  '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
+    | '/api/public/hooks/push-dispatch'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
+    | '/api/public/hooks/push-dispatch'
   id:
     | '__root__'
     | '/'
@@ -360,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/users_/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
+    | '/api/public/hooks/push-dispatch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -382,6 +395,7 @@ export interface RootRouteChildren {
   PaymentIdRoute: typeof PaymentIdRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
   ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
+  ApiPublicHooksPushDispatchRoute: typeof ApiPublicHooksPushDispatchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -568,6 +582,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/hooks/push-dispatch': {
+      id: '/api/public/hooks/push-dispatch'
+      path: '/api/public/hooks/push-dispatch'
+      fullPath: '/api/public/hooks/push-dispatch'
+      preLoaderRoute: typeof ApiPublicHooksPushDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/paystack': {
       id: '/api/public/hooks/paystack'
       path: '/api/public/hooks/paystack'
@@ -631,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentIdRoute: PaymentIdRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
   ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
+  ApiPublicHooksPushDispatchRoute: ApiPublicHooksPushDispatchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
