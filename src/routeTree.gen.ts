@@ -14,6 +14,7 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MessageRouteImport } from './routes/message'
 import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
 import { Route as FreeCashRouteImport } from './routes/free-cash'
@@ -30,11 +31,13 @@ import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
 import { Route as AdminComplaintsRouteImport } from './routes/admin.complaints'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users_.$id'
+import { Route as ApiPublicHooksPushDispatchRouteImport } from './routes/api/public/hooks/push-dispatch'
 import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
 import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
@@ -61,6 +64,11 @@ const RechargeRoute = RechargeRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessageRoute = MessageRouteImport.update({
@@ -143,6 +151,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInvestmentsRoute = AdminInvestmentsRouteImport.update({
   id: '/investments',
   path: '/investments',
@@ -168,6 +181,12 @@ const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
   path: '/users/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicHooksPushDispatchRoute =
+  ApiPublicHooksPushDispatchRouteImport.update({
+    id: '/api/public/hooks/push-dispatch',
+    path: '/api/public/hooks/push-dispatch',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
   id: '/api/public/hooks/paystack',
   path: '/api/public/hooks/paystack',
@@ -191,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -200,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/complaints': typeof AdminComplaintsRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -209,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
+  '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -220,6 +242,7 @@ export interface FileRoutesByTo {
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -229,6 +252,7 @@ export interface FileRoutesByTo {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/complaints': typeof AdminComplaintsRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -238,6 +262,7 @@ export interface FileRoutesByTo {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
+  '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,6 +276,7 @@ export interface FileRoutesById {
   '/free-cash': typeof FreeCashRoute
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/recharge': typeof RechargeRoute
   '/team': typeof TeamRoute
@@ -260,6 +286,7 @@ export interface FileRoutesById {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/complaints': typeof AdminComplaintsRoute
   '/admin/investments': typeof AdminInvestmentsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -269,6 +296,7 @@ export interface FileRoutesById {
   '/admin/users_/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
+  '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -283,6 +311,7 @@ export interface FileRouteTypes {
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
+    | '/notifications'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -292,6 +321,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/complaints'
     | '/admin/investments'
+    | '/admin/notifications'
     | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
@@ -301,6 +331,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
+    | '/api/public/hooks/push-dispatch'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -312,6 +343,7 @@ export interface FileRouteTypes {
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
+    | '/notifications'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -321,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/complaints'
     | '/admin/investments'
+    | '/admin/notifications'
     | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
@@ -330,6 +363,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
+    | '/api/public/hooks/push-dispatch'
   id:
     | '__root__'
     | '/'
@@ -342,6 +376,7 @@ export interface FileRouteTypes {
     | '/free-cash'
     | '/lucky-draw'
     | '/message'
+    | '/notifications'
     | '/orders'
     | '/recharge'
     | '/team'
@@ -351,6 +386,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/complaints'
     | '/admin/investments'
+    | '/admin/notifications'
     | '/admin/settings'
     | '/admin/transactions'
     | '/admin/users'
@@ -360,6 +396,7 @@ export interface FileRouteTypes {
     | '/admin/users_/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
+    | '/api/public/hooks/push-dispatch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -373,6 +410,7 @@ export interface RootRouteChildren {
   FreeCashRoute: typeof FreeCashRoute
   LuckyDrawRoute: typeof LuckyDrawRoute
   MessageRoute: typeof MessageRoute
+  NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
   RechargeRoute: typeof RechargeRoute
   TeamRoute: typeof TeamRoute
@@ -382,6 +420,7 @@ export interface RootRouteChildren {
   PaymentIdRoute: typeof PaymentIdRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
   ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
+  ApiPublicHooksPushDispatchRoute: typeof ApiPublicHooksPushDispatchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -419,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/message': {
@@ -533,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/investments': {
       id: '/admin/investments'
       path: '/investments'
@@ -568,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/hooks/push-dispatch': {
+      id: '/api/public/hooks/push-dispatch'
+      path: '/api/public/hooks/push-dispatch'
+      fullPath: '/api/public/hooks/push-dispatch'
+      preLoaderRoute: typeof ApiPublicHooksPushDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/paystack': {
       id: '/api/public/hooks/paystack'
       path: '/api/public/hooks/paystack'
@@ -590,6 +650,7 @@ interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
   AdminComplaintsRoute: typeof AdminComplaintsRoute
   AdminInvestmentsRoute: typeof AdminInvestmentsRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -602,6 +663,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
   AdminComplaintsRoute: AdminComplaintsRoute,
   AdminInvestmentsRoute: AdminInvestmentsRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -622,6 +684,7 @@ const rootRouteChildren: RootRouteChildren = {
   FreeCashRoute: FreeCashRoute,
   LuckyDrawRoute: LuckyDrawRoute,
   MessageRoute: MessageRoute,
+  NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,
   RechargeRoute: RechargeRoute,
   TeamRoute: TeamRoute,
@@ -631,6 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentIdRoute: PaymentIdRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
   ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
+  ApiPublicHooksPushDispatchRoute: ApiPublicHooksPushDispatchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
