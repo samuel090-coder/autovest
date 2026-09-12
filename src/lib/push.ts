@@ -3,7 +3,7 @@ import { getDeviceId, isStandalone } from "@/lib/device";
 
 /** Public VAPID key (safe to ship to the browser). */
 export const VAPID_PUBLIC_KEY =
-  "BM4IwJaxYmN5UEpiZ0Ad-1QCyMENmDqVfR9Po4Bj5zKYBmUTrBhlsmzvYY1cgB5g308OGCkMRwm5JFowVd3SNhY";
+  "BA572G_XW21GWJdUN_AjN6YjPMHQlUnudyetTqlb21GQjTwqRXjCqw-2Fdkg5r4t9y1OsqlCjYK99-C6vMRWxfc";
 
 export function pushSupported() {
   return (
