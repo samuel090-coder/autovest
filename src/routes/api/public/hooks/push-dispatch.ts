@@ -84,7 +84,8 @@ export const Route = createFileRoute("/api/public/hooks/push-dispatch")({
                     icon: n.icon_url ?? "/favicon.png",
                     tag: n.id,
                     timestamp: new Date(n.created_at).getTime(),
-                    action_label: (n.data as Record<string, unknown> | null)?.["action_label"] ?? null,
+                    action_label:
+                      (((n.data as Record<string, unknown> | null)?.["action_label"] as string | null) ?? null),
                   },
                   options: { ttl: 60 * 60 * 24, urgency: "high" },
                 },

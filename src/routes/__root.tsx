@@ -17,6 +17,7 @@ import { InstallReward } from "@/components/install-reward";
 import { OfferBadge } from "@/components/offer-badge";
 import { InvestReminder } from "@/components/invest-reminder";
 import { PwaInstallModal } from "@/components/pwa-install-modal";
+import { NotificationPermission } from "@/components/notification-permission";
 
 function NotFoundComponent() {
   return (
@@ -152,6 +153,7 @@ function RootComponent() {
       <OfferBadge />
       <InvestReminder />
       <PwaInstallModal />
+      <NotificationPermission />
 
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
