@@ -6,6 +6,7 @@ import { AppShell, BottomNav } from "@/components/app-shell";
 import { SupportBadge } from "@/components/support-badge";
 import { AnnouncementPopups } from "@/components/announcement-popups";
 import { WelcomeBonusPopup } from "@/components/welcome-bonus";
+import { NotificationBell } from "@/components/notification-bell";
 import { formatNaira } from "@/lib/format";
 import { ArrowRight, Headphones, Gift, HandCoins, ClipboardCheck, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -74,9 +75,12 @@ function Home() {
               <span className="grid h-5 w-5 place-items-center rounded bg-white/20"><HandCoins className="h-3 w-3" /></span>
               Account Balance <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-            <Link to="/withdraw" className="rounded-md bg-info px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
-              Withdraw <ArrowRight className="h-3 w-3" />
-            </Link>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <Link to="/withdraw" className="rounded-md bg-info px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
+                Withdraw <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
           <div className="mt-4 flex items-end justify-between">
             <div className="text-3xl font-bold tracking-tight">{formatNaira(wallet?.balance ?? 0)}</div>
