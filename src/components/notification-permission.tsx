@@ -34,7 +34,7 @@ export function NotificationPermission() {
     const timer = setTimeout(async () => {
       const { data } = await supabase.auth.getUser();
       if (!cancelled && data.user) setShow(true);
-    }, 6000);
+    }, 2500);
 
     return () => {
       cancelled = true;
