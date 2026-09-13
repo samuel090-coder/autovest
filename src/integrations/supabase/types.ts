@@ -1091,6 +1091,20 @@ export type Database = {
       claim_offer: { Args: { _key: string }; Returns: Json }
       claim_welcome_bonus: { Args: never; Returns: Json }
       complete_bonus_watch: { Args: { _video_id: string }; Returns: Json }
+      get_my_referral_stats: { Args: never; Returns: Json }
+      get_my_referrals: {
+        Args: never
+        Returns: {
+          bonus_earned: number
+          deposit_total: number
+          display_name: string
+          has_deposited: boolean
+          joined_at: string
+          referee_id: string
+          status: string
+        }[]
+      }
+      get_my_referrer: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1103,6 +1117,10 @@ export type Database = {
       lucky_spin: { Args: never; Returns: Json }
       lucky_sync_referrals: { Args: never; Returns: Json }
       mark_notifications_read: { Args: { _ids?: string[] }; Returns: number }
+      mask_identity: {
+        Args: { _name: string; _phone: string }
+        Returns: string
+      }
       notifications_hourly_maintenance: { Args: never; Returns: undefined }
       notify_user: {
         Args: {
