@@ -133,13 +133,7 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    const host = window.location.hostname;
-    const isPreview = import.meta.env.DEV || host.includes("id-preview") || host.includes("localhost");
-    if (isPreview) {
-      // Never keep a worker alive in preview/dev — it would serve stale builds.
-      void navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => void r.unregister()));
-      return;
-    }
+    // Messaging worker: required for web push, everywhere (it never precaches HTML).
     const onLoad = () => void navigator.serviceWorker.register("/sw.js").catch(() => {});
     if (document.readyState === "complete") onLoad();
     else window.addEventListener("load", onLoad, { once: true });
