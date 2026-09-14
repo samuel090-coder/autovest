@@ -44,18 +44,31 @@ function copy(text: string, label: string) {
 
 function PaymentPage() {
   const { id } = useParams({ from: "/payment/$id" });
+  const search = Route.useSearch();
+  const isNew = id === "new";
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [generating, setGenerating] = useState(true);
+  const [generating, setGenerating] = useState(isNew);
   const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2>(search.step === 2 ? 2 : 1);
+  const [creating, setCreating] = useState(false);
+
+  // Stable per-attempt key so double taps / refreshes reuse the same pending deposit.
+  const [idem] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const k = `recharge-idem:${search.amount ?? 0}`;
+    let v = sessionStorage.getItem(k);
+    if (!v) { v = (crypto.randomUUID?.() ?? String(Date.now())); sessionStorage.setItem(k, v); }
+    return v;
+  });
 
   useEffect(() => {
+    if (!isNew) return;
     const t = setTimeout(() => setGenerating(false), 3200);
     return () => clearTimeout(t);
-  }, []);
+  }, [isNew]);
 
   const { data: cfg } = useQuery({
     queryKey: ["manual-bank"],
@@ -67,13 +80,54 @@ function PaymentPage() {
 
   const { data: tx } = useQuery({
     queryKey: ["payment-tx", id],
+    enabled: !isNew,
     refetchInterval: 5000,
     queryFn: async () => (await supabase.from("transactions").select("*").eq("id", id).maybeSingle()).data,
   });
 
-  const amount = Number(tx?.amount ?? 0);
-  const reference = `INV-${id.slice(0, 8).toUpperCase()}`;
-  const status = tx?.status ?? "pending";
+  const amount = isNew ? Number(search.amount ?? 0) : Number(tx?.amount ?? 0);
+  const reference = `INV-${(isNew ? idem : id).slice(0, 8).toUpperCase()}`;
+  const status = isNew ? "pending" : (tx?.status ?? "pending");
+
+  /** Creates the deposit record only when the person confirms they have paid. */
+  async function confirmPaid() {
+    if (!isNew) { setStep(2); return; }
+    if (creating) return;
+    if (!amount || amount < 100) { toast.error("Invalid amount — please start again"); navigate({ to: "/recharge" }); return; }
+    setCreating(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) { navigate({ to: "/auth" }); return; }
+
+      // Reuse an existing pending deposit for this attempt instead of creating a duplicate.
+      const { data: existing } = await supabase
+        .from("transactions")
+        .select("id")
+        .eq("user_id", uid)
+        .eq("type", "recharge")
+        .eq("status", "pending")
+        .contains("meta", { idem })
+        .maybeSingle();
+
+      let txId = existing?.id;
+      if (!txId) {
+        const { data: created, error } = await supabase
+          .from("transactions")
+          .insert({ user_id: uid, type: "recharge", amount, status: "pending", meta: { method: "bank_transfer", idem } })
+          .select("id")
+          .single();
+        if (error || !created) throw new Error(error?.message ?? "Could not record your payment");
+        txId = created.id;
+      }
+      navigate({ to: "/payment/$id", params: { id: txId }, search: { step: 2 as const, amount: undefined }, replace: true });
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not record your payment");
+    } finally {
+      setCreating(false);
+    }
+  }
+
 
   const supportEmail = (cfg?.support_email ?? "cartswiftonline@gmail.com").trim();
   const emailBody = encodeURIComponent(
