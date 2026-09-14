@@ -39,13 +39,7 @@ export function ReferredWelcome() {
         <DialogTitle className="sr-only">You've been referred</DialogTitle>
 
         <div className="relative bg-gradient-to-br from-brand via-red-600 to-orange-500 px-5 pb-8 pt-7 text-center text-white">
-          <button
-            onClick={() => setOpen(false)}
-            aria-label="Close"
-            className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/20"
-          >
-            <X className="h-4 w-4" />
-          </button>
+
           <span className="mx-auto grid h-16 w-16 animate-bounce place-items-center rounded-full bg-white/20 backdrop-blur">
             <Gift className="h-8 w-8" />
           </span>
