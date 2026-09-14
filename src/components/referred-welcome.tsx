@@ -34,8 +34,8 @@ export function ReferredWelcome() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className="w-[calc(100vw-2rem)] max-w-[380px] overflow-hidden rounded-3xl border-0 p-0 duration-300 animate-in zoom-in-95"
-        showCloseButton={false}
       >
+
         <DialogTitle className="sr-only">You've been referred</DialogTitle>
 
         <div className="relative bg-gradient-to-br from-brand via-red-600 to-orange-500 px-5 pb-8 pt-7 text-center text-white">
