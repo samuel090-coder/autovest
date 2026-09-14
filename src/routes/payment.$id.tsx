@@ -233,12 +233,13 @@ function PaymentPage() {
 
               <div className="px-4 pt-4">
                 <Button
-                  onClick={() => setStep(2)}
-                  disabled={!copiedAccount}
+                  onClick={confirmPaid}
+                  disabled={!copiedAccount || creating}
                   className="h-12 w-full rounded-full bg-emerald-600 text-base font-semibold hover:bg-emerald-700 disabled:opacity-50"
                 >
-                  I have made the payment
+                  {creating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Recording…</> : "I have made the payment"}
                 </Button>
+
                 <p className="mt-2 text-center text-xs text-muted-foreground">
                   {copiedAccount ? "Tap to continue and get your payment token." : "Copy the account number first to continue."}
                 </p>
