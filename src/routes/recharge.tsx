@@ -80,19 +80,15 @@ function RechargePage() {
     if (!amt || amt < 100) return toast.error("Enter at least ₦100");
     setStarting(true);
     try {
-      const { data: tx, error } = await supabase
-        .from("transactions")
-        .insert({ user_id: userId, type: "recharge", amount: amt, status: "pending", meta: { method: "bank_transfer" } })
-        .select("id")
-        .single();
-      if (error || !tx) throw new Error(error?.message ?? "Could not start payment");
-      navigate({ to: "/payment/$id", params: { id: tx.id } });
-    } catch (e: any) {
-      toast.error(e.message ?? "Could not start payment");
+      // No record is created here — the deposit is only saved once the person
+      // confirms on the payment screen that they have transferred.
+      if (typeof window !== "undefined") sessionStorage.removeItem(`recharge-idem:${amt}`);
+      navigate({ to: "/payment/$id", params: { id: "new" }, search: { amount: amt, step: undefined } });
     } finally {
       setStarting(false);
     }
   }
+
 
   const headerBg = useMemo(() => "bg-gradient-to-b from-[#fdf6e8] to-[#fdebd0]", []);
 

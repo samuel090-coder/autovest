@@ -30,23 +30,21 @@ function Team() {
 
   const link = code ? `${typeof window !== "undefined" ? window.location.origin : ""}/auth?ref=${code}` : "";
 
-  const { data: refs = [] } = useQuery({
-    queryKey: ["my-refs", userId], enabled: !!userId,
-    queryFn: async () => (await supabase.from("profiles").select("id").eq("referred_by", userId!)).data ?? [],
+  const { data: stats } = useQuery({
+    queryKey: ["my-referral-stats", userId], enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await (supabase as any).rpc("get_my_referral_stats");
+      return (data ?? { total: 0, valid: 0, pending: 0, deposits: 0, earnings: 0 }) as
+        { total: number; valid: number; pending: number; deposits: number; earnings: number };
+    },
   });
+  const refs = { length: stats?.total ?? 0 };
+  const deposits = stats?.deposits ?? 0;
   const { data: wallet } = useQuery({
     queryKey: ["wallet", userId], enabled: !!userId,
     queryFn: async () => (await supabase.from("wallets").select("referral_bonus").eq("user_id", userId!).maybeSingle()).data,
   });
-  const { data: deposits = 0 } = useQuery({
-    queryKey: ["ref-deposits", userId], enabled: !!userId,
-    queryFn: async () => {
-      const refIds = refs.map((r: any) => r.id);
-      if (refIds.length === 0) return 0;
-      const { data } = await supabase.from("transactions").select("amount").in("user_id", refIds).eq("type", "recharge").eq("status", "approved");
-      return (data ?? []).reduce((s, t: any) => s + Number(t.amount), 0);
-    },
-  });
+
 
   function copy(text: string) { navigator.clipboard.writeText(text); toast.success("Copied"); }
 
@@ -94,12 +92,19 @@ Join me here 👉 ${link}`;
         </div>
       </div>
 
-      <div className="px-4 pt-5"><h2 className="text-lg font-bold">Referral Details</h2></div>
+      <div className="flex items-center justify-between px-4 pt-5">
+        <h2 className="text-lg font-bold">Referral Details</h2>
+        <Link to="/referrals" className="text-brand inline-flex items-center text-xs font-semibold">
+          View my referrals <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
       <div className="grid grid-cols-2 gap-3 px-4 pt-3">
-        <div className="rounded-2xl bg-card p-4 shadow-sm">
+        <Link to="/referrals" className="rounded-2xl bg-card p-4 shadow-sm">
           <div className="inline-flex items-center gap-1 text-sm"><User className="text-warning h-4 w-4" /> My referrals</div>
           <div className="mt-2 text-2xl font-bold">{refs.length}</div>
-        </div>
+          <div className="text-[11px] text-muted-foreground">{stats?.valid ?? 0} valid · {stats?.pending ?? 0} pending</div>
+        </Link>
+
         <div className="rounded-2xl bg-card p-4 shadow-sm">
           <div className="inline-flex items-center gap-1 text-sm"><CheckCircle2 className="text-warning h-4 w-4" /> Referral bonus</div>
           <div className="mt-2 flex items-center justify-between">
