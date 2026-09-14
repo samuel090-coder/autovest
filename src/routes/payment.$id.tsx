@@ -10,6 +10,10 @@ import { formatNaira } from "@/lib/format";
 
 export const Route = createFileRoute("/payment/$id")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>) => ({
+    amount: Number(s["amount"]) > 0 ? Number(s["amount"]) : undefined,
+    step: Number(s["step"]) === 2 ? 2 : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Complete Payment — InvestPro" },
@@ -22,6 +26,7 @@ export const Route = createFileRoute("/payment/$id")({
   }),
   component: PaymentPage,
 });
+
 
 type BankCfg = {
   bank_name?: string;
