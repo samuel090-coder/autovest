@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Gift, Rocket, X } from "lucide-react";
+import { Gift, Rocket } from "lucide-react";
 
 /**
  * Shown once to a user who registered through someone's referral link.
