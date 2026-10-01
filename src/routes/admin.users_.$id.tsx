@@ -224,6 +224,8 @@ function AdminUserDetail() {
         </div>
       </Card>
 
+      <WalletAdjustCard userId={profile.id} balance={Number(wallet?.balance ?? 0)} />
+
       {sharedIps.length > 0 && (
         <Card className="border-warning/50 bg-warning/5 p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-warning">
