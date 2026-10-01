@@ -1079,6 +1079,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_wallet: {
+        Args: { _amount: number; _reason: string; _user_id: string }
+        Returns: number
+      }
       admin_send_broadcast: { Args: { _id: string }; Returns: Json }
       audience_user_ids: {
         Args: { _audience: string }
@@ -1091,6 +1095,10 @@ export type Database = {
       claim_offer: { Args: { _key: string }; Returns: Json }
       claim_welcome_bonus: { Args: never; Returns: Json }
       complete_bonus_watch: { Args: { _video_id: string }; Returns: Json }
+      debit_wallet: {
+        Args: { _amount: number; _reason?: string }
+        Returns: number
+      }
       get_my_referral_stats: { Args: never; Returns: Json }
       get_my_referrals: {
         Args: never
@@ -1135,6 +1143,7 @@ export type Database = {
         }
         Returns: string
       }
+      purchase_investment: { Args: { _investment_id: string }; Returns: Json }
       redeem_free_cash: { Args: { _code: string }; Returns: Json }
       redeem_payment_token: {
         Args: { _token: string; _tx_id: string }

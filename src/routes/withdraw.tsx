@@ -131,13 +131,14 @@ function WithdrawPage() {
       }
 
       if (amt > Number(wallet?.balance ?? 0)) throw new Error("Insufficient balance");
+      // Debit first via the secure server function (users cannot update wallets directly).
+      const { error: dErr } = await supabase.rpc("debit_wallet", { _amount: amt, _reason: "withdrawal_request" });
+      if (dErr) throw new Error(dErr.message);
       const { error: txErr } = await supabase.from("transactions").insert({
         user_id: userId, type: "withdraw", amount: amt, status: "pending",
         meta: { source: "balance", bank_account_id: bank.id, holder_name: bank.holder_name, bank_name: bank.bank_name, account_number: bank.account_number },
       });
       if (txErr) throw txErr;
-      const { error: wErr } = await supabase.from("wallets").update({ balance: Number(wallet!.balance) - amt }).eq("user_id", userId);
-      if (wErr) throw wErr;
       return amt;
     },
     onSuccess: (amt) => {

@@ -1,13 +1,61 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatNaira } from "@/lib/format";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/users_/$id")({
   component: AdminUserDetail,
 });
+
+function WalletAdjustCard({ userId, balance }: { userId: string; balance: number }) {
+  const qc = useQueryClient();
+  const [amount, setAmount] = useState("");
+  const [reason, setReason] = useState("");
+
+  const adjust = useMutation({
+    mutationFn: async (direction: "credit" | "debit") => {
+      const amt = Number(amount);
+      if (!amt || amt <= 0) throw new Error("Enter a valid amount");
+      if (!reason.trim()) throw new Error("Enter a reason — the user will see it");
+      const { error } = await supabase.rpc("admin_adjust_wallet", {
+        _user_id: userId,
+        _amount: direction === "credit" ? amt : -amt,
+        _reason: reason.trim(),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Wallet updated — the user has been notified");
+      setAmount("");
+      setReason("");
+      qc.invalidateQueries({ queryKey: ["admin-user-detail", userId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Card className="p-4">
+      <h3 className="mb-1 text-sm font-semibold">Add / remove money</h3>
+      <p className="mb-3 text-xs text-muted-foreground">
+        Current balance: <span className="font-semibold text-foreground">{formatNaira(balance)}</span>. Every change is recorded in the money trail and the user gets a notification with your reason.
+      </p>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} placeholder="Amount (₦)" className="sm:w-40" />
+        <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (shown to the user)" className="flex-1" />
+      </div>
+      <div className="mt-2 flex gap-2">
+        <Button onClick={() => adjust.mutate("credit")} disabled={adjust.isPending} className="flex-1">Add money</Button>
+        <Button onClick={() => adjust.mutate("debit")} disabled={adjust.isPending} variant="destructive" className="flex-1">Remove money</Button>
+      </div>
+    </Card>
+  );
+}
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -175,6 +223,8 @@ function AdminUserDetail() {
           <Stat label="Active investments" value={String(invs.filter((i: any) => !i.claimed_at).length)} />
         </div>
       </Card>
+
+      <WalletAdjustCard userId={profile.id} balance={Number(wallet?.balance ?? 0)} />
 
       {sharedIps.length > 0 && (
         <Card className="border-warning/50 bg-warning/5 p-4">
