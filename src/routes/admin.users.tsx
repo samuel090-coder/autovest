@@ -41,9 +41,12 @@ function AdminUsers() {
 
   const adjust = useMutation({
     mutationFn: async ({ userId, delta }: { userId: string; delta: number }) => {
-      const { data: w } = await supabase.from("wallets").select("balance").eq("user_id", userId).maybeSingle();
-      const next = Number(w?.balance ?? 0) + delta;
-      const { error } = await supabase.from("wallets").update({ balance: next }).eq("user_id", userId);
+      const reason = window.prompt(
+        `Reason for ${delta > 0 ? "adding" : "removing"} ${formatNaira(Math.abs(delta))} ${delta > 0 ? "to" : "from"} this wallet? (shown to the user)`,
+        delta > 0 ? "Manual credit by admin" : "Manual deduction by admin",
+      );
+      if (reason === null) return;
+      const { error } = await supabase.rpc("admin_adjust_wallet", { _user_id: userId, _amount: delta, _reason: reason });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Balance updated"); qc.invalidateQueries({ queryKey: ["admin-users"] }); },
