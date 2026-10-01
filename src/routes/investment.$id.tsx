@@ -55,30 +55,12 @@ function InvestmentDetails() {
 
   const invest = useMutation({
     mutationFn: async () => {
-      if (!inv || !userId || !wallet) throw new Error("Not ready");
-      const price = Number(inv.price);
+      if (!inv || !userId) throw new Error("Not ready");
       if (isFree && alreadyClaimed) throw new Error("You have already claimed this free investment");
-      if (!isFree && Number(wallet.balance) < price) throw new Error("Insufficient balance — please recharge");
-      const { error: txErr } = await supabase.from("transactions").insert({
-        user_id: userId, type: "invest", amount: price, status: "approved",
-        meta: { investment_id: inv.id, name: inv.name },
-      });
-      if (txErr) throw txErr;
-      const { error: uiErr } = await supabase.from("user_investments").insert({
-        user_id: userId, investment_id: inv.id, quantity: 1,
-        price_paid: price, daily_income: inv.daily_income,
-        total_income: inv.total_income, cycle_days: inv.cycle_days,
-      });
-      if (uiErr) {
-        if ((uiErr as { code?: string }).code === "23505") throw new Error("You have already claimed this free investment");
-        throw uiErr;
-      }
-      if (price > 0) {
-        const { error: wErr } = await supabase.from("wallets")
-          .update({ balance: Number(wallet.balance) - price })
-          .eq("user_id", userId);
-        if (wErr) throw wErr;
-      }
+      if (!isFree && Number(wallet?.balance ?? 0) < Number(inv.price)) throw new Error("Insufficient balance — please recharge");
+      // Atomic server-side purchase: debits the wallet and records everything in one transaction.
+      const { error } = await supabase.rpc("purchase_investment", { _investment_id: inv.id });
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       toast.success(isFree ? "Free investment claimed!" : "Investment successful");
