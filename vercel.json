@@ -1,5 +1,93 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+
+  "cleanUrls": true,
+  "trailingSlash": false,
+
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+
+  "images": {
+    "sizes": [256, 384, 512, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    "domains": ["://unsplash.com", "example.com"],
+    "minimumCacheTTL": 31536000,
+    "formats": ["image/avif", "image/webp"]
+  },
+
+  "git": {
+    "deploymentEnabled": true
+  },
+
+  "github": {
+    "silent": true,
+    "autoJobCancelation": true
+  },
+
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-database",
+      "schedule": "0 0 * * *"
+    }
+  ],
+
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 15,
+      "memory": 1024
+    }
+  },
+
+  "redirects": [
+    { 
+      "source": "/old-landing-page", 
+      "destination": "/", 
+      "permanent": true 
+    }
+  ],
+
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { 
+      "source": "/api/(.*)", 
+      "destination": "/api/$1" 
+    },
+    { 
+      "source": "/(.*)", 
+      "destination": "/index.html" 
+    }
+  ],
+
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS,PUT,DELETE" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" }
+      ]
+    }
   ]
-}
+    }
+      
