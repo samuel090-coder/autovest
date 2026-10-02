@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Active investment progress uses the dedicated `/orders/$id` route so order actions and user-scoped details stay isolated from product purchase pages.

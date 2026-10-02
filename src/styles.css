@@ -38,6 +38,13 @@
   --color-warning: var(--warning);
   --color-info: var(--info);
   --color-dark-surface: var(--dark-surface);
+  --color-offer: var(--offer);
+  --color-offer-foreground: var(--offer-foreground);
+  --color-offer-highlight: var(--offer-highlight);
+  --color-offer-border: var(--offer-border);
+  --color-charge-shell: var(--charge-shell);
+  --color-charge-fill: var(--charge-fill);
+  --color-charge-glow: var(--charge-glow);
 }
 
 :root {
@@ -70,6 +77,13 @@
   --info: oklch(0.62 0.16 250);
 
   --dark-surface: oklch(0.25 0.01 260);
+  --offer: oklch(0.18 0.03 150);
+  --offer-foreground: oklch(0.96 0.03 145);
+  --offer-highlight: oklch(0.82 0.2 135);
+  --offer-border: oklch(0.44 0.1 145);
+  --charge-shell: oklch(0.18 0.02 155);
+  --charge-fill: oklch(0.7 0.19 145);
+  --charge-glow: oklch(0.78 0.2 140);
 
   --border: oklch(0.92 0.01 250);
   --input: oklch(0.93 0.01 250);
@@ -102,6 +116,13 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.65 0.22 25);
+  --offer: oklch(0.14 0.025 150);
+  --offer-foreground: oklch(0.96 0.03 145);
+  --offer-highlight: oklch(0.82 0.2 135);
+  --offer-border: oklch(0.4 0.1 145);
+  --charge-shell: oklch(0.11 0.02 155);
+  --charge-fill: oklch(0.72 0.19 145);
+  --charge-glow: oklch(0.8 0.2 140);
 }
 
 @layer base {
@@ -131,4 +152,38 @@
     background: linear-gradient(160deg, oklch(0.78 0.18 145) 0%, oklch(0.62 0.18 150) 100%);
   }
   .text-balance-neg { color: oklch(0.62 0.22 25); text-decoration: line-through; }
+
+  .offer-led-track { animation: offer-led-scroll 16s linear infinite; }
+  .money-rain-drop { animation: money-fall 2.5s linear infinite; }
+  .battery-charge { animation: charge-glow 2s ease-in-out infinite; }
+  .battery-bolt { animation: charge-pulse 1.5s ease-in-out infinite; }
+}
+
+@keyframes offer-led-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes money-fall {
+  0% { transform: translate3d(0, -36px, 0) rotate(-8deg); opacity: 0; }
+  14% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translate3d(10px, 250px, 0) rotate(10deg); opacity: 0; }
+}
+
+@keyframes charge-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px color-mix(in oklab, var(--charge-glow) 35%, transparent)); }
+  50% { filter: drop-shadow(0 0 16px color-mix(in oklab, var(--charge-glow) 75%, transparent)); }
+}
+
+@keyframes charge-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offer-led-track,
+  .money-rain-drop,
+  .battery-charge,
+  .battery-bolt { animation: none; }
 }
