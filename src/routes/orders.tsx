@@ -7,10 +7,17 @@ import { SupportBadge } from "@/components/support-badge";
 import { formatNaira } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { TrendingUp, Repeat } from "lucide-react";
+import { TrendingUp, Repeat, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/orders")({
-  head: () => ({ meta: [{ title: "My Orders — InvestPro" }] }),
+  head: () => ({ meta: [
+    { title: "My Orders — AutoVest" },
+    { name: "description", content: "Track active AutoVest investments, earnings, rounds, and payouts." },
+    { property: "og:title", content: "My Orders — AutoVest" },
+    { property: "og:description", content: "Track active AutoVest investments, earnings, rounds, and payouts." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Orders,
 });
 
@@ -76,7 +83,13 @@ function OrderCard({ order, onChange }: { order: any; onChange: () => void }) {
   });
 
   return (
-    <div className="rounded-2xl bg-card shadow-sm">
+    <div className="overflow-hidden rounded-2xl bg-card shadow-sm">
+      <Link
+        to="/orders/$id"
+        params={{ id: String(order.id) }}
+        aria-label={`Open ${order.investment?.name ?? "investment"} live progress`}
+        className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
       <div className="flex gap-3 p-3">
         <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
           {order.investment?.image_url && <img src={order.investment.image_url} alt="" className="h-full w-full object-cover" />}
@@ -84,7 +97,7 @@ function OrderCard({ order, onChange }: { order: any; onChange: () => void }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <div className="truncate font-semibold">{order.investment?.name}</div>
-            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand">Round {round}/{maxRounds}</span>
+            <span className="flex shrink-0 items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand">Round {round}/{maxRounds}<ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" /></span>
           </div>
           <div className="mt-1 text-xs text-muted-foreground">Starting: {new Date(order.purchased_at).toLocaleString()}</div>
           <div className="text-xs"><span className="text-muted-foreground">Expiration: </span><span className="text-warning font-semibold">{endAt.toLocaleString()}</span></div>
@@ -103,7 +116,9 @@ function OrderCard({ order, onChange }: { order: any; onChange: () => void }) {
           <span className="text-muted-foreground"><TrendingUp className="mr-1 inline h-3 w-3" />Earned live</span>
           <span className="text-success font-bold tabular-nums">+{earnedAll.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
         </div>
+        <div className="mt-2 text-center text-[11px] font-semibold text-brand">Tap to view live progress</div>
       </div>
+      </Link>
 
       {roundComplete && !allDone && (
         <button onClick={() => nextRound.mutate()} disabled={nextRound.isPending}
