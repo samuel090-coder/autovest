@@ -44,7 +44,7 @@ function RunningInvestmentPage() {
       if (!userId) return null;
       const { data, error } = await supabase
         .from("user_investments")
-        .select("*, investment:investments(name, image_url, description, max_rounds)")
+        .select("*, investment:investments(name, image_url, description, max_rounds, price)")
         .eq("id", id)
         .eq("user_id", userId)
         .is("claimed_at", null)
@@ -137,7 +137,7 @@ function RunningInvestmentPage() {
 
       <section className="px-4 py-5">
         <div className="grid grid-cols-3 gap-2 text-center">
-          <Metric label="Invested" value={formatNaira(order.price)} />
+          <Metric label="Invested" value={formatNaira(order.investment?.price)} />
           <Metric label="Daily" value={formatNaira(dailyIncome)} highlight />
           <Metric label="Total" value={formatNaira(totalIncome)} />
         </div>
