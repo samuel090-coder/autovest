@@ -28,6 +28,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PaymentIdRouteImport } from './routes/payment.$id'
+import { Route as OrdersIdRouteImport } from './routes/orders.$id'
 import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
@@ -137,6 +138,11 @@ const PaymentIdRoute = PaymentIdRouteImport.update({
   path: '/payment/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrdersIdRoute = OrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => OrdersRoute,
+} as any)
 const InvestmentIdRoute = InvestmentIdRouteImport.update({
   id: '/investment/$id',
   path: '/investment/$id',
@@ -217,7 +223,7 @@ export interface FileRoutesByFullPath {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
+  '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -250,7 +257,7 @@ export interface FileRoutesByTo {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
+  '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -285,7 +293,7 @@ export interface FileRoutesById {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/investment/$id': typeof InvestmentIdRoute
+  '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/users_/$id': typeof AdminUsersIdRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
+    | '/orders/$id'
     | '/payment/$id'
     | '/admin/'
     | '/admin/users/$id'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
+    | '/orders/$id'
     | '/payment/$id'
     | '/admin'
     | '/admin/users/$id'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/investment/$id'
+    | '/orders/$id'
     | '/payment/$id'
     | '/admin/'
     | '/admin/users_/$id'
@@ -423,7 +435,7 @@ export interface RootRouteChildren {
   LuckyDrawRoute: typeof LuckyDrawRoute
   MessageRoute: typeof MessageRoute
   NotificationsRoute: typeof NotificationsRoute
-  OrdersRoute: typeof OrdersRoute
+  OrdersRoute: typeof OrdersRouteWithChildren
   RechargeRoute: typeof RechargeRoute
   ReferralsRoute: typeof ReferralsRoute
   TeamRoute: typeof TeamRoute
@@ -571,6 +583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orders/$id': {
+      id: '/orders/$id'
+      path: '/$id'
+      fullPath: '/orders/$id'
+      preLoaderRoute: typeof OrdersIdRouteImport
+      parentRoute: typeof OrdersRoute
+    }
     '/investment/$id': {
       id: '/investment/$id'
       path: '/investment/$id'
@@ -693,6 +712,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface OrdersRouteChildren {
+  OrdersIdRoute: typeof OrdersIdRoute
+}
+
+const OrdersRouteChildren: OrdersRouteChildren = {
+  OrdersIdRoute: OrdersIdRoute,
+}
+
+const OrdersRouteWithChildren =
+  OrdersRoute._addFileChildren(OrdersRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -705,7 +735,7 @@ const rootRouteChildren: RootRouteChildren = {
   LuckyDrawRoute: LuckyDrawRoute,
   MessageRoute: MessageRoute,
   NotificationsRoute: NotificationsRoute,
-  OrdersRoute: OrdersRoute,
+  OrdersRoute: OrdersRouteWithChildren,
   RechargeRoute: RechargeRoute,
   ReferralsRoute: ReferralsRoute,
   TeamRoute: TeamRoute,
