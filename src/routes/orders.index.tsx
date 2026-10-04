@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { TrendingUp, Repeat, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/orders")({
+export const Route = createFileRoute("/orders/")({
   head: () => ({ meta: [
     { title: "My Orders — AutoVest" },
     { name: "description", content: "Track active AutoVest investments, earnings, rounds, and payouts." },

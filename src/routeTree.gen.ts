@@ -14,7 +14,6 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as RechargeRouteImport } from './routes/recharge'
-import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MessageRouteImport } from './routes/message'
 import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
@@ -26,6 +25,7 @@ import { Route as BonusTaskRouteImport } from './routes/bonus-task'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PaymentIdRouteImport } from './routes/payment.$id'
 import { Route as OrdersIdRouteImport } from './routes/orders.$id'
@@ -66,11 +66,6 @@ const ReferralsRoute = ReferralsRouteImport.update({
 const RechargeRoute = RechargeRouteImport.update({
   id: '/recharge',
   path: '/recharge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersRoute = OrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -128,6 +123,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrdersIndexRoute = OrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -139,9 +139,9 @@ const PaymentIdRoute = PaymentIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersIdRoute = OrdersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => OrdersRoute,
+  id: '/orders/$id',
+  path: '/orders/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InvestmentIdRoute = InvestmentIdRouteImport.update({
   id: '/investment/$id',
@@ -223,7 +223,6 @@ export interface FileRoutesByFullPath {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -241,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/orders/': typeof OrdersIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -257,7 +257,6 @@ export interface FileRoutesByTo {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -275,6 +274,7 @@ export interface FileRoutesByTo {
   '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin': typeof AdminIndexRoute
+  '/orders': typeof OrdersIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -293,7 +293,6 @@ export interface FileRoutesById {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -311,6 +310,7 @@ export interface FileRoutesById {
   '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/orders/': typeof OrdersIndexRoute
   '/admin/users_/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -330,7 +330,6 @@ export interface FileRouteTypes {
     | '/lucky-draw'
     | '/message'
     | '/notifications'
-    | '/orders'
     | '/recharge'
     | '/referrals'
     | '/team'
@@ -348,6 +347,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/payment/$id'
     | '/admin/'
+    | '/orders/'
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -364,7 +364,6 @@ export interface FileRouteTypes {
     | '/lucky-draw'
     | '/message'
     | '/notifications'
-    | '/orders'
     | '/recharge'
     | '/referrals'
     | '/team'
@@ -382,6 +381,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/payment/$id'
     | '/admin'
+    | '/orders'
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -399,7 +399,6 @@ export interface FileRouteTypes {
     | '/lucky-draw'
     | '/message'
     | '/notifications'
-    | '/orders'
     | '/recharge'
     | '/referrals'
     | '/team'
@@ -417,6 +416,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/payment/$id'
     | '/admin/'
+    | '/orders/'
     | '/admin/users_/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -435,14 +435,15 @@ export interface RootRouteChildren {
   LuckyDrawRoute: typeof LuckyDrawRoute
   MessageRoute: typeof MessageRoute
   NotificationsRoute: typeof NotificationsRoute
-  OrdersRoute: typeof OrdersRouteWithChildren
   RechargeRoute: typeof RechargeRoute
   ReferralsRoute: typeof ReferralsRoute
   TeamRoute: typeof TeamRoute
   WalletRoute: typeof WalletRoute
   WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
+  OrdersIdRoute: typeof OrdersIdRoute
   PaymentIdRoute: typeof PaymentIdRoute
+  OrdersIndexRoute: typeof OrdersIndexRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
   ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
   ApiPublicHooksPushDispatchRoute: typeof ApiPublicHooksPushDispatchRoute
@@ -483,13 +484,6 @@ declare module '@tanstack/react-router' {
       path: '/recharge'
       fullPath: '/recharge'
       preLoaderRoute: typeof RechargeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders': {
-      id: '/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -569,6 +563,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orders/': {
+      id: '/orders/'
+      path: '/orders'
+      fullPath: '/orders/'
+      preLoaderRoute: typeof OrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -585,10 +586,10 @@ declare module '@tanstack/react-router' {
     }
     '/orders/$id': {
       id: '/orders/$id'
-      path: '/$id'
+      path: '/orders/$id'
       fullPath: '/orders/$id'
       preLoaderRoute: typeof OrdersIdRouteImport
-      parentRoute: typeof OrdersRoute
+      parentRoute: typeof rootRouteImport
     }
     '/investment/$id': {
       id: '/investment/$id'
@@ -712,17 +713,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface OrdersRouteChildren {
-  OrdersIdRoute: typeof OrdersIdRoute
-}
-
-const OrdersRouteChildren: OrdersRouteChildren = {
-  OrdersIdRoute: OrdersIdRoute,
-}
-
-const OrdersRouteWithChildren =
-  OrdersRoute._addFileChildren(OrdersRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -735,14 +725,15 @@ const rootRouteChildren: RootRouteChildren = {
   LuckyDrawRoute: LuckyDrawRoute,
   MessageRoute: MessageRoute,
   NotificationsRoute: NotificationsRoute,
-  OrdersRoute: OrdersRouteWithChildren,
   RechargeRoute: RechargeRoute,
   ReferralsRoute: ReferralsRoute,
   TeamRoute: TeamRoute,
   WalletRoute: WalletRoute,
   WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
+  OrdersIdRoute: OrdersIdRoute,
   PaymentIdRoute: PaymentIdRoute,
+  OrdersIndexRoute: OrdersIndexRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
   ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
   ApiPublicHooksPushDispatchRoute: ApiPublicHooksPushDispatchRoute,
