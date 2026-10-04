@@ -113,21 +113,6 @@ function RunningInvestmentPage() {
   const endAt = new Date(purchasedAt + cycleSeconds * 1000);
   const remainingSeconds = Math.max(0, Math.ceil(cycleSeconds - elapsedSeconds));
 
-  if (isLoading || !userId) {
-    return <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">Loading live progress…</div>;
-  }
-
-  if (!order) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background px-6 text-center">
-        <div>
-          <h1 className="text-xl font-bold">Investment not found</h1>
-          <p className="mt-2 text-sm text-muted-foreground">This investment is unavailable or has already been claimed.</p>
-          <Button asChild className="mt-5"><Link to="/orders">Back to orders</Link></Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <main className="mx-auto min-h-screen max-w-md overflow-hidden bg-background pb-8 pt-[30px]">
