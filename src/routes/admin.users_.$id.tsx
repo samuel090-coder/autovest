@@ -8,6 +8,7 @@ import { formatNaira } from "@/lib/format";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AccountControlsCard } from "@/components/account-controls-card";
 
 export const Route = createFileRoute("/admin/users_/$id")({
   component: AdminUserDetail,
@@ -225,6 +226,7 @@ function AdminUserDetail() {
       </Card>
 
       <WalletAdjustCard userId={profile.id} balance={Number(wallet?.balance ?? 0)} />
+      <AccountControlsCard userId={profile.id} name={profile.full_name || profile.email || "this user"} restrictedAt={(profile as any).restricted_at ?? null} restrictedReason={(profile as any).restricted_reason ?? null} />
 
       {sharedIps.length > 0 && (
         <Card className="border-warning/50 bg-warning/5 p-4">
