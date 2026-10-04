@@ -152,6 +152,7 @@ function RootComponent() {
       <PwaInstallModal />
       <NotificationPermission />
       <ReferredWelcome />
+      <RestrictionGate />
 
 
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
