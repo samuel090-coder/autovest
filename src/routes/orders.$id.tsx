@@ -54,6 +54,33 @@ function RunningInvestmentPage() {
     },
   });
 
+  const nextRound = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.rpc("start_next_round", { _uinv_id: order!.id });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(`Next round started`);
+      qc.invalidateQueries({ queryKey: ["my-investments"] });
+      refetch();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const claim = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.rpc("claim_investment", { _uinv_id: order!.id });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Payout credited to balance");
+      qc.invalidateQueries({ queryKey: ["my-investments"] });
+      qc.invalidateQueries({ queryKey: ["wallet"] });
+      window.location.assign("/orders");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   if (isLoading || !userId) {
     return <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">Loading live progress…</div>;
   }
@@ -86,32 +113,21 @@ function RunningInvestmentPage() {
   const endAt = new Date(purchasedAt + cycleSeconds * 1000);
   const remainingSeconds = Math.max(0, Math.ceil(cycleSeconds - elapsedSeconds));
 
-  const nextRound = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.rpc("start_next_round", { _uinv_id: order.id });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success(`Round ${round + 1} started`);
-      qc.invalidateQueries({ queryKey: ["my-investments"] });
-      refetch();
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
+  if (isLoading || !userId) {
+    return <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">Loading live progress…</div>;
+  }
 
-  const claim = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.rpc("claim_investment", { _uinv_id: order.id });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Payout credited to balance");
-      qc.invalidateQueries({ queryKey: ["my-investments"] });
-      qc.invalidateQueries({ queryKey: ["wallet"] });
-      window.location.assign("/orders");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
+  if (!order) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-6 text-center">
+        <div>
+          <h1 className="text-xl font-bold">Investment not found</h1>
+          <p className="mt-2 text-sm text-muted-foreground">This investment is unavailable or has already been claimed.</p>
+          <Button asChild className="mt-5"><Link to="/orders">Back to orders</Link></Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="mx-auto min-h-screen max-w-md overflow-hidden bg-background pb-8 pt-[30px]">
