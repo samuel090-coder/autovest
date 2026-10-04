@@ -9,113 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as BonusTaskRouteImport } from './routes/bonus-task'
-import { Route as CertificationRouteImport } from './routes/certification'
-import { Route as ChatRouteImport } from './routes/chat'
-import { Route as EarnMoreRouteImport } from './routes/earn-more'
-import { Route as FreeCashRouteImport } from './routes/free-cash'
-import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
-import { Route as MessageRouteImport } from './routes/message'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as OrdersRouteImport } from './routes/orders'
-import { Route as RechargeRouteImport } from './routes/recharge'
-import { Route as ReferralsRouteImport } from './routes/referrals'
-import { Route as TeamRouteImport } from './routes/team'
-import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as WithdrawRouteImport } from './routes/withdraw'
+import { Route as WalletRouteImport } from './routes/wallet'
+import { Route as TeamRouteImport } from './routes/team'
+import { Route as ReferralsRouteImport } from './routes/referrals'
+import { Route as RechargeRouteImport } from './routes/recharge'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as MessageRouteImport } from './routes/message'
+import { Route as LuckyDrawRouteImport } from './routes/lucky-draw'
+import { Route as FreeCashRouteImport } from './routes/free-cash'
+import { Route as EarnMoreRouteImport } from './routes/earn-more'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as CertificationRouteImport } from './routes/certification'
+import { Route as BonusTaskRouteImport } from './routes/bonus-task'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
-import { Route as AdminBannersRouteImport } from './routes/admin.banners'
-import { Route as AdminComplaintsRouteImport } from './routes/admin.complaints'
-import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
-import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
-import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
-import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
-import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
-import { Route as OrdersIdRouteImport } from './routes/orders.$id'
 import { Route as PaymentIdRouteImport } from './routes/payment.$id'
+import { Route as OrdersIdRouteImport } from './routes/orders.$id'
+import { Route as InvestmentIdRouteImport } from './routes/investment.$id'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminInvestmentsRouteImport } from './routes/admin.investments'
+import { Route as AdminComplaintsRouteImport } from './routes/admin.complaints'
+import { Route as AdminBannersRouteImport } from './routes/admin.banners'
+import { Route as AdminAiCreateRouteImport } from './routes/admin.ai-create'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users_.$id'
-import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
-import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
 import { Route as ApiPublicHooksPushDispatchRouteImport } from './routes/api/public/hooks/push-dispatch'
+import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
+import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BonusTaskRoute = BonusTaskRouteImport.update({
-  id: '/bonus-task',
-  path: '/bonus-task',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CertificationRoute = CertificationRouteImport.update({
-  id: '/certification',
-  path: '/certification',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatRoute = ChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EarnMoreRoute = EarnMoreRouteImport.update({
-  id: '/earn-more',
-  path: '/earn-more',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FreeCashRoute = FreeCashRouteImport.update({
-  id: '/free-cash',
-  path: '/free-cash',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LuckyDrawRoute = LuckyDrawRouteImport.update({
-  id: '/lucky-draw',
-  path: '/lucky-draw',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessageRoute = MessageRouteImport.update({
-  id: '/message',
-  path: '/message',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersRoute = OrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RechargeRoute = RechargeRouteImport.update({
-  id: '/recharge',
-  path: '/recharge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReferralsRoute = ReferralsRouteImport.update({
-  id: '/referrals',
-  path: '/referrals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TeamRoute = TeamRouteImport.update({
-  id: '/team',
-  path: '/team',
+const WithdrawRoute = WithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WalletRoute = WalletRouteImport.update({
@@ -123,9 +53,79 @@ const WalletRoute = WalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WithdrawRoute = WithdrawRouteImport.update({
-  id: '/withdraw',
-  path: '/withdraw',
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralsRoute = ReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RechargeRoute = RechargeRouteImport.update({
+  id: '/recharge',
+  path: '/recharge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessageRoute = MessageRouteImport.update({
+  id: '/message',
+  path: '/message',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LuckyDrawRoute = LuckyDrawRouteImport.update({
+  id: '/lucky-draw',
+  path: '/lucky-draw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeCashRoute = FreeCashRouteImport.update({
+  id: '/free-cash',
+  path: '/free-cash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnMoreRoute = EarnMoreRouteImport.update({
+  id: '/earn-more',
+  path: '/earn-more',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificationRoute = CertificationRouteImport.update({
+  id: '/certification',
+  path: '/certification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BonusTaskRoute = BonusTaskRouteImport.update({
+  id: '/bonus-task',
+  path: '/bonus-task',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersIndexRoute = OrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -133,34 +133,24 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAiCreateRoute = AdminAiCreateRouteImport.update({
-  id: '/ai-create',
-  path: '/ai-create',
-  getParentRoute: () => AdminRoute,
+const PaymentIdRoute = PaymentIdRouteImport.update({
+  id: '/payment/$id',
+  path: '/payment/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminBannersRoute = AdminBannersRouteImport.update({
-  id: '/banners',
-  path: '/banners',
-  getParentRoute: () => AdminRoute,
+const OrdersIdRoute = OrdersIdRouteImport.update({
+  id: '/orders/$id',
+  path: '/orders/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminComplaintsRoute = AdminComplaintsRouteImport.update({
-  id: '/complaints',
-  path: '/complaints',
-  getParentRoute: () => AdminRoute,
+const InvestmentIdRoute = InvestmentIdRouteImport.update({
+  id: '/investment/$id',
+  path: '/investment/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminInvestmentsRoute = AdminInvestmentsRouteImport.update({
-  id: '/investments',
-  path: '/investments',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
@@ -168,35 +158,45 @@ const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
   path: '/transactions',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
-const InvestmentIdRoute = InvestmentIdRouteImport.update({
-  id: '/investment/$id',
-  path: '/investment/$id',
-  getParentRoute: () => rootRouteImport,
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
 } as any)
-const OrdersIdRoute = OrdersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => OrdersRoute,
+const AdminInvestmentsRoute = AdminInvestmentsRouteImport.update({
+  id: '/investments',
+  path: '/investments',
+  getParentRoute: () => AdminRoute,
 } as any)
-const PaymentIdRoute = PaymentIdRouteImport.update({
-  id: '/payment/$id',
-  path: '/payment/$id',
-  getParentRoute: () => rootRouteImport,
+const AdminComplaintsRoute = AdminComplaintsRouteImport.update({
+  id: '/complaints',
+  path: '/complaints',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBannersRoute = AdminBannersRouteImport.update({
+  id: '/banners',
+  path: '/banners',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAiCreateRoute = AdminAiCreateRouteImport.update({
+  id: '/ai-create',
+  path: '/ai-create',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
   id: '/users_/$id',
   path: '/users/$id',
   getParentRoute: () => AdminRoute,
 } as any)
-const ApiPublicHooksGenerateProofRoute =
-  ApiPublicHooksGenerateProofRouteImport.update({
-    id: '/api/public/hooks/generate-proof',
-    path: '/api/public/hooks/generate-proof',
+const ApiPublicHooksPushDispatchRoute =
+  ApiPublicHooksPushDispatchRouteImport.update({
+    id: '/api/public/hooks/push-dispatch',
+    path: '/api/public/hooks/push-dispatch',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
@@ -204,10 +204,10 @@ const ApiPublicHooksPaystackRoute = ApiPublicHooksPaystackRouteImport.update({
   path: '/api/public/hooks/paystack',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksPushDispatchRoute =
-  ApiPublicHooksPushDispatchRouteImport.update({
-    id: '/api/public/hooks/push-dispatch',
-    path: '/api/public/hooks/push-dispatch',
+const ApiPublicHooksGenerateProofRoute =
+  ApiPublicHooksGenerateProofRouteImport.update({
+    id: '/api/public/hooks/generate-proof',
+    path: '/api/public/hooks/generate-proof',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -223,7 +223,6 @@ export interface FileRoutesByFullPath {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -241,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/orders/': typeof OrdersIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -257,7 +257,6 @@ export interface FileRoutesByTo {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -275,6 +274,7 @@ export interface FileRoutesByTo {
   '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin': typeof AdminIndexRoute
+  '/orders': typeof OrdersIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -293,7 +293,6 @@ export interface FileRoutesById {
   '/lucky-draw': typeof LuckyDrawRoute
   '/message': typeof MessageRoute
   '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRouteWithChildren
   '/recharge': typeof RechargeRoute
   '/referrals': typeof ReferralsRoute
   '/team': typeof TeamRoute
@@ -311,6 +310,7 @@ export interface FileRoutesById {
   '/orders/$id': typeof OrdersIdRoute
   '/payment/$id': typeof PaymentIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/orders/': typeof OrdersIndexRoute
   '/admin/users_/$id': typeof AdminUsersIdRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
@@ -330,7 +330,6 @@ export interface FileRouteTypes {
     | '/lucky-draw'
     | '/message'
     | '/notifications'
-    | '/orders'
     | '/recharge'
     | '/referrals'
     | '/team'
@@ -348,6 +347,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/payment/$id'
     | '/admin/'
+    | '/orders/'
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -364,7 +364,6 @@ export interface FileRouteTypes {
     | '/lucky-draw'
     | '/message'
     | '/notifications'
-    | '/orders'
     | '/recharge'
     | '/referrals'
     | '/team'
@@ -382,6 +381,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/payment/$id'
     | '/admin'
+    | '/orders'
     | '/admin/users/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -399,7 +399,6 @@ export interface FileRouteTypes {
     | '/lucky-draw'
     | '/message'
     | '/notifications'
-    | '/orders'
     | '/recharge'
     | '/referrals'
     | '/team'
@@ -417,6 +416,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/payment/$id'
     | '/admin/'
+    | '/orders/'
     | '/admin/users_/$id'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
@@ -435,14 +435,15 @@ export interface RootRouteChildren {
   LuckyDrawRoute: typeof LuckyDrawRoute
   MessageRoute: typeof MessageRoute
   NotificationsRoute: typeof NotificationsRoute
-  OrdersRoute: typeof OrdersRouteWithChildren
   RechargeRoute: typeof RechargeRoute
   ReferralsRoute: typeof ReferralsRoute
   TeamRoute: typeof TeamRoute
   WalletRoute: typeof WalletRoute
   WithdrawRoute: typeof WithdrawRoute
   InvestmentIdRoute: typeof InvestmentIdRoute
+  OrdersIdRoute: typeof OrdersIdRoute
   PaymentIdRoute: typeof PaymentIdRoute
+  OrdersIndexRoute: typeof OrdersIndexRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
   ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
   ApiPublicHooksPushDispatchRoute: typeof ApiPublicHooksPushDispatchRoute
@@ -450,109 +451,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bonus-task': {
-      id: '/bonus-task'
-      path: '/bonus-task'
-      fullPath: '/bonus-task'
-      preLoaderRoute: typeof BonusTaskRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/certification': {
-      id: '/certification'
-      path: '/certification'
-      fullPath: '/certification'
-      preLoaderRoute: typeof CertificationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat': {
-      id: '/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/earn-more': {
-      id: '/earn-more'
-      path: '/earn-more'
-      fullPath: '/earn-more'
-      preLoaderRoute: typeof EarnMoreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/free-cash': {
-      id: '/free-cash'
-      path: '/free-cash'
-      fullPath: '/free-cash'
-      preLoaderRoute: typeof FreeCashRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lucky-draw': {
-      id: '/lucky-draw'
-      path: '/lucky-draw'
-      fullPath: '/lucky-draw'
-      preLoaderRoute: typeof LuckyDrawRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/message': {
-      id: '/message'
-      path: '/message'
-      fullPath: '/message'
-      preLoaderRoute: typeof MessageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notifications': {
-      id: '/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders': {
-      id: '/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recharge': {
-      id: '/recharge'
-      path: '/recharge'
-      fullPath: '/recharge'
-      preLoaderRoute: typeof RechargeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/referrals': {
-      id: '/referrals'
-      path: '/referrals'
-      fullPath: '/referrals'
-      preLoaderRoute: typeof ReferralsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/team': {
-      id: '/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof TeamRouteImport
+    '/withdraw': {
+      id: '/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof WithdrawRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wallet': {
@@ -562,11 +465,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/withdraw': {
-      id: '/withdraw'
-      path: '/withdraw'
-      fullPath: '/withdraw'
-      preLoaderRoute: typeof WithdrawRouteImport
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referrals': {
+      id: '/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof ReferralsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recharge': {
+      id: '/recharge'
+      path: '/recharge'
+      fullPath: '/recharge'
+      preLoaderRoute: typeof RechargeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/message': {
+      id: '/message'
+      path: '/message'
+      fullPath: '/message'
+      preLoaderRoute: typeof MessageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lucky-draw': {
+      id: '/lucky-draw'
+      path: '/lucky-draw'
+      fullPath: '/lucky-draw'
+      preLoaderRoute: typeof LuckyDrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-cash': {
+      id: '/free-cash'
+      path: '/free-cash'
+      fullPath: '/free-cash'
+      preLoaderRoute: typeof FreeCashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-more': {
+      id: '/earn-more'
+      path: '/earn-more'
+      fullPath: '/earn-more'
+      preLoaderRoute: typeof EarnMoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certification': {
+      id: '/certification'
+      path: '/certification'
+      fullPath: '/certification'
+      preLoaderRoute: typeof CertificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bonus-task': {
+      id: '/bonus-task'
+      path: '/bonus-task'
+      fullPath: '/bonus-task'
+      preLoaderRoute: typeof BonusTaskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/': {
+      id: '/orders/'
+      path: '/orders'
+      fullPath: '/orders/'
+      preLoaderRoute: typeof OrdersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -576,46 +577,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/ai-create': {
-      id: '/admin/ai-create'
-      path: '/ai-create'
-      fullPath: '/admin/ai-create'
-      preLoaderRoute: typeof AdminAiCreateRouteImport
-      parentRoute: typeof AdminRoute
+    '/payment/$id': {
+      id: '/payment/$id'
+      path: '/payment/$id'
+      fullPath: '/payment/$id'
+      preLoaderRoute: typeof PaymentIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/banners': {
-      id: '/admin/banners'
-      path: '/banners'
-      fullPath: '/admin/banners'
-      preLoaderRoute: typeof AdminBannersRouteImport
-      parentRoute: typeof AdminRoute
+    '/orders/$id': {
+      id: '/orders/$id'
+      path: '/orders/$id'
+      fullPath: '/orders/$id'
+      preLoaderRoute: typeof OrdersIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/complaints': {
-      id: '/admin/complaints'
-      path: '/complaints'
-      fullPath: '/admin/complaints'
-      preLoaderRoute: typeof AdminComplaintsRouteImport
-      parentRoute: typeof AdminRoute
+    '/investment/$id': {
+      id: '/investment/$id'
+      path: '/investment/$id'
+      fullPath: '/investment/$id'
+      preLoaderRoute: typeof InvestmentIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/investments': {
-      id: '/admin/investments'
-      path: '/investments'
-      fullPath: '/admin/investments'
-      preLoaderRoute: typeof AdminInvestmentsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/notifications': {
-      id: '/admin/notifications'
-      path: '/notifications'
-      fullPath: '/admin/notifications'
-      preLoaderRoute: typeof AdminNotificationsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/transactions': {
@@ -625,33 +612,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTransactionsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/investment/$id': {
-      id: '/investment/$id'
-      path: '/investment/$id'
-      fullPath: '/investment/$id'
-      preLoaderRoute: typeof InvestmentIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/orders/$id': {
-      id: '/orders/$id'
-      path: '/$id'
-      fullPath: '/orders/$id'
-      preLoaderRoute: typeof OrdersIdRouteImport
-      parentRoute: typeof OrdersRoute
+    '/admin/investments': {
+      id: '/admin/investments'
+      path: '/investments'
+      fullPath: '/admin/investments'
+      preLoaderRoute: typeof AdminInvestmentsRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/payment/$id': {
-      id: '/payment/$id'
-      path: '/payment/$id'
-      fullPath: '/payment/$id'
-      preLoaderRoute: typeof PaymentIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/complaints': {
+      id: '/admin/complaints'
+      path: '/complaints'
+      fullPath: '/admin/complaints'
+      preLoaderRoute: typeof AdminComplaintsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/banners': {
+      id: '/admin/banners'
+      path: '/banners'
+      fullPath: '/admin/banners'
+      preLoaderRoute: typeof AdminBannersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ai-create': {
+      id: '/admin/ai-create'
+      path: '/ai-create'
+      fullPath: '/admin/ai-create'
+      preLoaderRoute: typeof AdminAiCreateRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/users_/$id': {
       id: '/admin/users_/$id'
@@ -660,11 +661,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIdRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/api/public/hooks/generate-proof': {
-      id: '/api/public/hooks/generate-proof'
-      path: '/api/public/hooks/generate-proof'
-      fullPath: '/api/public/hooks/generate-proof'
-      preLoaderRoute: typeof ApiPublicHooksGenerateProofRouteImport
+    '/api/public/hooks/push-dispatch': {
+      id: '/api/public/hooks/push-dispatch'
+      path: '/api/public/hooks/push-dispatch'
+      fullPath: '/api/public/hooks/push-dispatch'
+      preLoaderRoute: typeof ApiPublicHooksPushDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/paystack': {
@@ -674,11 +675,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksPaystackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/push-dispatch': {
-      id: '/api/public/hooks/push-dispatch'
-      path: '/api/public/hooks/push-dispatch'
-      fullPath: '/api/public/hooks/push-dispatch'
-      preLoaderRoute: typeof ApiPublicHooksPushDispatchRouteImport
+    '/api/public/hooks/generate-proof': {
+      id: '/api/public/hooks/generate-proof'
+      path: '/api/public/hooks/generate-proof'
+      fullPath: '/api/public/hooks/generate-proof'
+      preLoaderRoute: typeof ApiPublicHooksGenerateProofRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -712,17 +713,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface OrdersRouteChildren {
-  OrdersIdRoute: typeof OrdersIdRoute
-}
-
-const OrdersRouteChildren: OrdersRouteChildren = {
-  OrdersIdRoute: OrdersIdRoute,
-}
-
-const OrdersRouteWithChildren =
-  OrdersRoute._addFileChildren(OrdersRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -735,14 +725,15 @@ const rootRouteChildren: RootRouteChildren = {
   LuckyDrawRoute: LuckyDrawRoute,
   MessageRoute: MessageRoute,
   NotificationsRoute: NotificationsRoute,
-  OrdersRoute: OrdersRouteWithChildren,
   RechargeRoute: RechargeRoute,
   ReferralsRoute: ReferralsRoute,
   TeamRoute: TeamRoute,
   WalletRoute: WalletRoute,
   WithdrawRoute: WithdrawRoute,
   InvestmentIdRoute: InvestmentIdRoute,
+  OrdersIdRoute: OrdersIdRoute,
   PaymentIdRoute: PaymentIdRoute,
+  OrdersIndexRoute: OrdersIndexRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
   ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
   ApiPublicHooksPushDispatchRoute: ApiPublicHooksPushDispatchRoute,
