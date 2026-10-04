@@ -648,6 +648,8 @@ export type Database = {
           phone: string | null
           referral_code: string | null
           referred_by: string | null
+          restricted_at: string | null
+          restricted_reason: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -658,6 +660,8 @@ export type Database = {
           phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          restricted_at?: string | null
+          restricted_reason?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -668,6 +672,8 @@ export type Database = {
           phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          restricted_at?: string | null
+          restricted_reason?: string | null
         }
         Relationships: []
       }
@@ -1083,7 +1089,12 @@ export type Database = {
         Args: { _amount: number; _reason: string; _user_id: string }
         Returns: number
       }
+      admin_purge_user_data: { Args: { _user_id: string }; Returns: undefined }
       admin_send_broadcast: { Args: { _id: string }; Returns: Json }
+      admin_set_restriction: {
+        Args: { _reason: string; _restricted: boolean; _user_id: string }
+        Returns: undefined
+      }
       audience_user_ids: {
         Args: { _audience: string }
         Returns: {
@@ -1170,6 +1181,7 @@ export type Database = {
         | "bonus"
         | "free_cash"
         | "lottery_claim"
+        | "admin_adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1310,6 +1322,7 @@ export const Constants = {
         "bonus",
         "free_cash",
         "lottery_claim",
+        "admin_adjustment",
       ],
     },
   },
