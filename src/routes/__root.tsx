@@ -20,6 +20,7 @@ import { InvestReminder } from "@/components/invest-reminder";
 import { PwaInstallModal } from "@/components/pwa-install-modal";
 import { NotificationPermission } from "@/components/notification-permission";
 import { ReferredWelcome } from "@/components/referred-welcome";
+import { RestrictionGate } from "@/components/restriction-gate";
 
 
 function NotFoundComponent() {
