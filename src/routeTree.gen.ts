@@ -42,6 +42,7 @@ import { Route as AdminUsersIdRouteImport } from './routes/admin.users_.$id'
 import { Route as ApiPublicHooksPushDispatchRouteImport } from './routes/api/public/hooks/push-dispatch'
 import { Route as ApiPublicHooksPaystackRouteImport } from './routes/api/public/hooks/paystack'
 import { Route as ApiPublicHooksGenerateProofRouteImport } from './routes/api/public/hooks/generate-proof'
+import { Route as ApiPublicHooksDailyMotivationRouteImport } from './routes/api/public/hooks/daily-motivation'
 
 const WithdrawRoute = WithdrawRouteImport.update({
   id: '/withdraw',
@@ -210,6 +211,12 @@ const ApiPublicHooksGenerateProofRoute =
     path: '/api/public/hooks/generate-proof',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDailyMotivationRoute =
+  ApiPublicHooksDailyMotivationRouteImport.update({
+    id: '/api/public/hooks/daily-motivation',
+    path: '/api/public/hooks/daily-motivation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
+  '/api/public/hooks/daily-motivation': typeof ApiPublicHooksDailyMotivationRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
   '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
@@ -276,6 +284,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
+  '/api/public/hooks/daily-motivation': typeof ApiPublicHooksDailyMotivationRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
   '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
@@ -312,6 +321,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/admin/users_/$id': typeof AdminUsersIdRoute
+  '/api/public/hooks/daily-motivation': typeof ApiPublicHooksDailyMotivationRoute
   '/api/public/hooks/generate-proof': typeof ApiPublicHooksGenerateProofRoute
   '/api/public/hooks/paystack': typeof ApiPublicHooksPaystackRoute
   '/api/public/hooks/push-dispatch': typeof ApiPublicHooksPushDispatchRoute
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/orders/'
     | '/admin/users/$id'
+    | '/api/public/hooks/daily-motivation'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
     | '/api/public/hooks/push-dispatch'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/orders'
     | '/admin/users/$id'
+    | '/api/public/hooks/daily-motivation'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
     | '/api/public/hooks/push-dispatch'
@@ -418,6 +430,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/orders/'
     | '/admin/users_/$id'
+    | '/api/public/hooks/daily-motivation'
     | '/api/public/hooks/generate-proof'
     | '/api/public/hooks/paystack'
     | '/api/public/hooks/push-dispatch'
@@ -444,6 +457,7 @@ export interface RootRouteChildren {
   OrdersIdRoute: typeof OrdersIdRoute
   PaymentIdRoute: typeof PaymentIdRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
+  ApiPublicHooksDailyMotivationRoute: typeof ApiPublicHooksDailyMotivationRoute
   ApiPublicHooksGenerateProofRoute: typeof ApiPublicHooksGenerateProofRoute
   ApiPublicHooksPaystackRoute: typeof ApiPublicHooksPaystackRoute
   ApiPublicHooksPushDispatchRoute: typeof ApiPublicHooksPushDispatchRoute
@@ -682,6 +696,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksGenerateProofRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/daily-motivation': {
+      id: '/api/public/hooks/daily-motivation'
+      path: '/api/public/hooks/daily-motivation'
+      fullPath: '/api/public/hooks/daily-motivation'
+      preLoaderRoute: typeof ApiPublicHooksDailyMotivationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -734,6 +755,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersIdRoute: OrdersIdRoute,
   PaymentIdRoute: PaymentIdRoute,
   OrdersIndexRoute: OrdersIndexRoute,
+  ApiPublicHooksDailyMotivationRoute: ApiPublicHooksDailyMotivationRoute,
   ApiPublicHooksGenerateProofRoute: ApiPublicHooksGenerateProofRoute,
   ApiPublicHooksPaystackRoute: ApiPublicHooksPaystackRoute,
   ApiPublicHooksPushDispatchRoute: ApiPublicHooksPushDispatchRoute,
