@@ -183,6 +183,8 @@ function AdminUserDetail() {
   const withdrawals = txs.filter((t: any) => t.type === "withdraw");
   const lastSession = activity.find((a: any) => a.ip);
   const lastDevice = activity.find((a: any) => a.device_id) as any;
+  const lastLocation = activity.find((a: any) => a.city || a.region || a.country);
+  const lastUserAgent = activity.find((a: any) => a.user_agent);
 
   const bonusesClaimed: string[] = [];
   if (wallet?.welcome_bonus_claimed) bonusesClaimed.push("Welcome ₦500");
@@ -308,14 +310,14 @@ function AdminUserDetail() {
             value={inviter ? <Link to="/admin/users/$id" params={{ id: inviter.id }} className="text-brand underline">{inviter.full_name || inviter.phone || inviter.id}</Link> : "Direct signup"}
           />
           <Row label="Last IP" value={<span className="font-mono text-xs">{lastSession?.ip ?? "not captured yet"}</span>} />
-          <Row label="Location" value={[lastSession?.city, lastSession?.region, lastSession?.country].filter(Boolean).join(", ") || "—"} />
+          <Row label="Location" value={[lastLocation?.city, lastLocation?.region, lastLocation?.country].filter(Boolean).join(", ") || "—"} />
           <Row label="Device" value={[lastDevice?.device_model, lastDevice?.os].filter(Boolean).join(" · ") || "—"} />
           <Row label="Browser" value={lastDevice?.browser ?? "—"} />
           <Row label="Device ID" value={<span className="font-mono text-xs">{lastDevice?.device_id ?? "not captured yet"}</span>} />
           <Row label="Devices used" value={String(new Set(activity.map((a: any) => a.device_id).filter(Boolean)).size)} />
           <Row label="Installed app" value={install ? `Yes · ₦${Number(install.reward_amount)} credited ${new Date(install.created_at).toLocaleDateString()}` : "No"} />
           <Row label="Offers claimed" value={offerClaims.length ? offerClaims.map((o: any) => `${o.offer_key} (${formatNaira(o.amount)})`).join(", ") : "None"} />
-          <Row label="User agent" value={<span className="text-xs">{lastSession?.user_agent ?? "—"}</span>} />
+          <Row label="User agent" value={<span className="text-xs">{lastUserAgent?.user_agent ?? "—"}</span>} />
 
         </Card>
 

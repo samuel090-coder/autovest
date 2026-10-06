@@ -19,12 +19,12 @@ function clientIp(req: Request): string | null {
   const h = req.headers;
   const fwd = h.get("cf-connecting-ip") || h.get("x-real-ip") || h.get("x-forwarded-for");
   if (!fwd) return null;
-  return fwd.split(",")[0]!.trim();
+  return fwd.split(",")[0]?.trim() || null;
 }
 
 async function lookupGeo(ip: string) {
   try {
-    const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`);
+    const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, { signal: AbortSignal.timeout(2500) });
     if (!res.ok) return {};
     const j = (await res.json()) as { success?: boolean; country?: string; region?: string; city?: string };
     if (!j.success) return {};
@@ -41,8 +41,42 @@ export const logActivity = createServerFn({ method: "POST" })
     const req = getRequest();
     const ip = clientIp(req);
     const ua = req.headers.get("user-agent");
-    let geo: { country?: string | null; region?: string | null; city?: string | null } = {};
-    if (data.geo && ip) geo = await lookupGeo(ip);
+    const cf = (req as Request & { cf?: { country?: string; region?: string; city?: string } }).cf;
+    let geo: { country?: string | null; region?: string | null; city?: string | null } = {
+      country: cf?.country ?? null,
+      region: cf?.region ?? null,
+      city: cf?.city ?? null,
+    };
+    if (data.geo && ip && (!geo.country || !geo.region || !geo.city)) {
+      const lookedUp = await lookupGeo(ip);
+      geo = {
+        country: geo.country ?? lookedUp.country ?? null,
+        region: geo.region ?? lookedUp.region ?? null,
+        city: geo.city ?? lookedUp.city ?? null,
+      };
+    }
+
+    const browser = data.browser ?? (
+      /Edg\//.test(ua ?? "") ? "Edge"
+      : /OPR\//.test(ua ?? "") ? "Opera"
+      : /SamsungBrowser/.test(ua ?? "") ? "Samsung Internet"
+      : /Chrome\//.test(ua ?? "") ? "Chrome"
+      : /Firefox\//.test(ua ?? "") ? "Firefox"
+      : /Safari\//.test(ua ?? "") ? "Safari"
+      : null
+    );
+    const os = data.os ?? (
+      /Android/i.test(ua ?? "") ? "Android"
+      : /iPhone|iPad|iPod/i.test(ua ?? "") ? "iOS"
+      : /Windows/i.test(ua ?? "") ? "Windows"
+      : /Mac OS X/i.test(ua ?? "") ? "macOS"
+      : /Linux/i.test(ua ?? "") ? "Linux"
+      : null
+    );
+    const deviceModel = data.device_model ?? (
+      ua?.match(/\(Linux;[^)]*?;\s*([^;)]+?)\s*(?:Build|\))/)?.[1]?.trim() ??
+      (/iPhone/i.test(ua ?? "") ? "iPhone" : /iPad/i.test(ua ?? "") ? "iPad" : os)
+    );
 
     const { error } = await context.supabase.from("user_activity").insert({
       user_id: context.userId,
@@ -56,11 +90,14 @@ export const logActivity = createServerFn({ method: "POST" })
       region: geo.region ?? null,
       city: geo.city ?? null,
       device_id: data.device_id ?? null,
-      device_model: data.device_model ?? null,
-      browser: data.browser ?? null,
-      os: data.os ?? null,
+      device_model: deviceModel ?? null,
+      browser,
+      os,
       is_pwa: data.is_pwa ?? false,
     });
-    if (error) return { ok: false, error: error.message };
+    if (error) {
+      console.error("Activity record insert failed:", error.message);
+      return { ok: false, error: error.message };
+    }
     return { ok: true };
   });

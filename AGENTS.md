@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Active investment progress uses the dedicated `/orders/$id` route so order actions and user-scoped details stay isolated from product purchase pages.
+- Signed-in activity is captured from auth-state changes and route changes, with IP/device parsing on the server so initial-session timing does not silently skip telemetry.
