@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+import { getRequest, getRequestIP } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type ActivityInput = {
@@ -14,13 +14,6 @@ type ActivityInput = {
   os?: string;
   is_pwa?: boolean;
 };
-
-function clientIp(req: Request): string | null {
-  const h = req.headers;
-  const fwd = h.get("cf-connecting-ip") || h.get("x-real-ip") || h.get("x-forwarded-for");
-  if (!fwd) return null;
-  return fwd.split(",")[0]?.trim() || null;
-}
 
 async function lookupGeo(ip: string) {
   try {
@@ -39,7 +32,7 @@ export const logActivity = createServerFn({ method: "POST" })
   .inputValidator((input: ActivityInput) => input ?? {})
   .handler(async ({ data, context }) => {
     const req = getRequest();
-    const ip = clientIp(req);
+    const ip = req.headers.get("cf-connecting-ip")?.trim() || getRequestIP({ xForwardedFor: true }) || null;
     const ua = req.headers.get("user-agent");
     const cf = (req as Request & { cf?: { country?: string; region?: string; city?: string } }).cf;
     let geo: { country?: string | null; region?: string | null; city?: string | null } = {
