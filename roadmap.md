@@ -6,3 +6,4 @@
 - [x] Declined: auto-wiping user balances for inactivity — explained to user
 - [x] Move Earn ₦500,000 offer into a clickable top LED ticker
 - [x] Add clickable order cards and an animated live investment battery page
+- [ ] Restore reliable signed-in IP, location, device, browser, device ID, and user-agent capture; verify admin display
